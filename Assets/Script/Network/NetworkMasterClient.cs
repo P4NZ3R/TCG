@@ -1,0 +1,369 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.Networking;
+using System.Net.NetworkInformation;
+using UnityEngine;
+using BitB.ReadFile;
+
+public class NetworkMasterClient : MonoBehaviour
+{
+    public string masterServerIpAddress;
+    public int masterServerPort;
+    string gameNameDef;
+    public string gameName;
+    public string comment;
+
+    string hostGameType = "";
+    string hostGameName = "";
+    bool tryLanConnection;
+
+    MasterMsgTypes.Room[] hosts = null;
+
+    [HideInInspector]public NetworkClient client = null;
+
+    [HideInInspector]public static NetworkMasterClient singleton;
+
+    [HideInInspector]public NetworkDiscovery discovery;
+
+    string version;
+    string sceneName;
+    string serverBrowserScene;
+    string startMenuScene;
+    string host;
+    int port;
+    string serverName;
+
+    void Awake()
+    {
+        //NOTE prende il nome della scena
+        #if !UNITY_EDITOR
+        //version
+        version = ReadServerSettings.GetSetting("version", "N/D");
+        //scenes
+        sceneName = ReadServerSettings.GetSetting("gameScene0", "TestScene");
+        serverBrowserScene = ReadServerSettings.GetSetting("serverBrowserScene", "ServerBrowserBITB");
+        startMenuScene = ReadServerSettings.GetSetting("startMenuScene", "StartMenuBITB");
+        //net
+        host = ReadServerSettings.GetSetting("serverIP", "NOIP" /*"139.162.141.32"*/);
+        port = int.Parse(ReadServerSettings.GetSetting("serverPort", "15936"));
+        serverName = ReadServerSettings.GetSetting("serverName", "Server Name");
+        #else
+        //version
+        version = PlayerPrefs.GetString("version", "N/D");
+        //scenes
+        sceneName = PlayerPrefs.GetString("gameScene0", "TestScene");
+        serverBrowserScene = PlayerPrefs.GetString("serverBrowserScene", "ServerBrowserBITB");
+        startMenuScene = PlayerPrefs.GetString("startMenuScene", "StartMenuBITB");
+        //net
+        host = PlayerPrefs.GetString("serverIP", "NOIP" /*"139.162.141.32"*/);
+        port = int.Parse(PlayerPrefs.GetString("serverPort", "15936"));
+        serverName = PlayerPrefs.GetString("serverName", "Server Name");
+        #endif
+    }
+
+    void Start()
+    {
+        NetworkManagerExtended.Instance.networkPort = 27000;
+        gameNameDef = gameName;
+        if (singleton == null)
+        {
+            singleton = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        discovery = this.GetComponent<NetworkDiscovery>();
+        discovery.Initialize();
+
+        InitializeClient();
+        #if HEADLESS
+        StartCoroutine(RegisterServer(gameName + "■" + NetworkManagerExtended.Instance.networkPort));
+        #endif
+    }
+
+    public void InitializeClient()
+    {
+        if (client != null)
+        {
+            Debug.LogError("Already connected");
+            return;
+        }
+            
+        client = new NetworkClient();
+        client.Connect(masterServerIpAddress, masterServerPort);
+
+        // system msgs
+        client.RegisterHandler(MsgType.Connect, OnClientConnect);
+        client.RegisterHandler(MsgType.Disconnect, OnClientDisconnect);
+        client.RegisterHandler(MsgType.Error, OnClientError);
+
+        // application msgs
+        client.RegisterHandler(MasterMsgTypes.RegisteredHostId, OnRegisteredHost);
+        client.RegisterHandler(MasterMsgTypes.UnregisteredHostId, OnUnregisteredHost);
+        client.RegisterHandler(MasterMsgTypes.ListOfHostsId, OnListOfHosts);
+
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public void ResetClient()
+    {
+        if (client == null)
+            return;
+
+        client.Disconnect();
+        client = null;
+        hosts = null;
+    }
+
+    public bool IsConnected
+    {
+        get
+        {
+            if (client == null)
+                return false;
+            else
+                return client.isConnected;
+        }
+    }
+
+    // --------------- System Handlers -----------------
+
+    void OnClientConnect(NetworkMessage netMsg)
+    {
+        Debug.Log("Client Connected to Master");
+        RequestHostList(hostGameType);
+    }
+
+    void OnClientDisconnect(NetworkMessage netMsg)
+    {
+        Debug.Log("Client Disconnected from Master");
+        ResetClient();
+        OnFailedToConnectToMasterServer();
+    }
+
+    void OnClientError(NetworkMessage netMsg)
+    {
+        Debug.Log("ClientError from Master");
+        OnFailedToConnectToMasterServer();
+    }
+
+    // --------------- Application Handlers -----------------
+
+    void OnRegisteredHost(NetworkMessage netMsg)
+    {
+        var msg = netMsg.ReadMessage<MasterMsgTypes.RegisteredHostMessage>();
+        OnServerEvent((MasterMsgTypes.NetworkMasterServerEvent)msg.resultCode);
+    }
+
+    void OnUnregisteredHost(NetworkMessage netMsg)
+    {
+        var msg = netMsg.ReadMessage<MasterMsgTypes.RegisteredHostMessage>();
+        OnServerEvent((MasterMsgTypes.NetworkMasterServerEvent)msg.resultCode);
+    }
+
+    void OnListOfHosts(NetworkMessage netMsg)
+    {
+        var msg = netMsg.ReadMessage<MasterMsgTypes.ListOfHostsMessage>();
+        hosts = msg.hosts;
+//        Debug.Log("hosts limit " + hosts[0].playerLimit + "  " + hosts[0].playerLimit ); 
+        OnServerEvent(MasterMsgTypes.NetworkMasterServerEvent.HostListReceived);
+    }
+
+    public void ClearHostList()
+    {
+        if (!IsConnected)
+        {
+            Debug.LogError("ClearHostList not connected");
+            return;
+        }
+        hosts = null;
+
+    }
+
+    public MasterMsgTypes.Room[] PollHostList()
+    {
+        if (!IsConnected)
+        {
+            Debug.LogError("PollHostList not connected");
+            return null;
+        }
+        return hosts;
+    }
+
+    public void RegisterHost(string gameTypeName, string gameName, string comment, bool passwordProtected, int playerLimit, int port)
+    {
+        if (!IsConnected)
+        {
+            Debug.LogError("RegisterHost not connected");
+            return;
+        }
+        var msg = new MasterMsgTypes.RegisterHostMessage();
+        msg.gameTypeName = gameTypeName;
+        msg.gameName = gameName;
+        msg.comment = comment;
+        msg.passwordProtected = passwordProtected;
+        msg.playerLimit = playerLimit;
+        msg.hostPort = port;
+        client.Send(MasterMsgTypes.RegisterHostId, msg);
+        hostGameType = gameTypeName;
+        hostGameName = gameName;
+    }
+
+    public void RequestHostList(string gameTypeName)
+    {
+        if (!IsConnected)
+        {
+            Debug.LogError("RequestHostList not connected");
+            return;
+        }
+
+        var msg = new MasterMsgTypes.RequestHostListMessage();
+        msg.gameTypeName = gameTypeName;
+        client.Send(MasterMsgTypes.RequestListOfHostsId, msg);
+    }
+
+    public void UnregisterHost()
+    {
+        if (!IsConnected)
+        {
+            Debug.LogError("UnregisterHost not connected");
+            return;
+        }
+
+        var msg = new MasterMsgTypes.UnregisterHostMessage();
+        msg.gameTypeName = hostGameType;
+        msg.gameName = hostGameName;
+        client.Send(MasterMsgTypes.UnregisterHostId, msg);
+        hostGameType = "";
+        hostGameName = "";
+
+        Debug.Log("send UnregisterHost");
+    }
+
+    public virtual void OnFailedToConnectToMasterServer()
+    {
+        Debug.Log("OnFailedToConnectToMasterServer");
+    }
+
+    public virtual void OnServerEvent(MasterMsgTypes.NetworkMasterServerEvent evt)
+    {
+//        Debug.Log("OnServerEvent " + evt);
+
+        if (evt == MasterMsgTypes.NetworkMasterServerEvent.HostListReceived)
+        {
+            foreach (var h in hosts)
+            {
+                string ip = h.hostIp.Substring(7);
+//                EditorDebug.LogError("Host:" + h.name + " addr:" + ip + ":" + h.hostPort + " limit " + h.playerLimit);
+//                Debug.Log("REgistrato con successo manngaaia con limit " + hosts[0].playerLimit + " ip " + hosts[0].hostIp + " port " + hosts[0].hostPort + " id " + hosts[0].connectionId + " name " + hosts[0].name + " comment " + hosts[0].comment);
+            }
+        }
+        if (evt == MasterMsgTypes.NetworkMasterServerEvent.RegistrationSucceeded)
+        {
+            NetworkManagerExtended.Instance.onlineScene = sceneName;
+            NetworkManagerExtended.Instance.StartServer();
+        }
+        if (evt == MasterMsgTypes.NetworkMasterServerEvent.RegistrationFailedGameName)
+        {
+            if (NetworkManagerExtended.Instance.networkPort <= 28000)
+            {
+                NetworkManagerExtended.Instance.networkPort++;
+            }
+            else
+            {
+                Debug.LogError("any port is locked");
+                Application.Quit();  
+            }
+        }
+    }
+    //registro il server sul masterserver
+    IEnumerator  RegisterServer(string gameName)
+    {
+        yield return new WaitForSeconds(5);
+        RegisterHost("Voodoo", gameName, comment, false, 8, NetworkManagerExtended.Instance.networkPort);
+    }
+
+    IEnumerator PingUpdate(string ip)
+    {
+        UnityEngine.Ping ping = new UnityEngine.Ping(ip);
+        yield return new WaitForSeconds(1f);
+//        Debug.Log("ip " + ip + " done " + ping.isDone + " time " + ping.time);
+
+        while (!ping.isDone)
+            yield return null;
+        int PingValue = ping.time;
+    }
+
+    void OnRecievedBroadcast(string fromAdress, string data)
+    {
+        Debug.LogError("Trovato");
+    }
+
+    public void JoinServer(int id)
+    {
+        string ip = hosts[id].hostIp.Substring(7);
+        Debug.Log("host ip nomal " + hosts[id].hostIp + " ip mod " + ip + " port " + hosts[id].hostPort + " name " + hosts[id].name + " comment " + hosts[id].comment + " scene " + sceneName + " id " + id);
+        NetworkManagerExtended.Instance.networkAddress = ip;
+        NetworkManagerExtended.Instance.networkPort = hosts[id].hostPort;
+        NetworkManagerExtended.Instance.onlineScene = sceneName;
+        NetworkManagerExtended.Instance.StartClient();
+    }
+
+    public void StartLanServer()
+    {
+        NetworkManagerExtended.Instance.networkAddress = Network.player.ipAddress;
+        NetworkManagerExtended.Instance.onlineScene = sceneName;
+        NetworkManagerExtended.Instance.StartServer();
+        discovery.Initialize();
+        discovery.StartAsServer();
+    }
+
+    public void StartLanConnection()
+    {
+        NetworkManagerExtended.Instance.onlineScene = sceneName;
+        StartCoroutine(LanConnection());
+    }
+
+    IEnumerator LanConnection()
+    {
+        discovery.StartAsClient();
+        yield return new WaitForSeconds(1f);
+        bool myIp = false;
+        foreach (KeyValuePair <string, NetworkBroadcastResult> kv in discovery.broadcastsReceived)
+        {
+            string serverIp = kv.Value.serverAddress;
+            serverIp = serverIp.Substring(7);
+//            Debug.Log("ip kv " + serverIp + " player " + Network.player.ipAddress);
+            if (serverIp == Network.player.ipAddress)
+            {
+//                Debug.Log("Trovato " + serverIp);
+                myIp = true;
+            }
+        }
+
+        if (myIp)
+            NetworkManagerExtended.Instance.networkAddress = Network.player.ipAddress;
+        else
+        {
+            foreach (KeyValuePair <string, NetworkBroadcastResult> kv in discovery.broadcastsReceived)
+            {
+                string serverIp = kv.Value.serverAddress;
+                serverIp = serverIp.Substring(7);
+                NetworkManagerExtended.Instance.networkAddress = serverIp;
+//                Debug.Log("Trovato un altro");
+                break;
+            }
+        }
+        discovery.StopBroadcast();
+        NetworkManagerExtended.Instance.StartClient();
+    }
+
+    void OnStartClient()
+    {
+        Debug.LogError("client connected");
+        tryLanConnection = false;
+    }
+}

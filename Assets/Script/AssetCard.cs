@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class YourClassAsset
+public class AssetCard
 {
     [MenuItem("Assets/Create/NewCard")]
     public static void CreateAsset ()
     {
-        ScriptableObjectUtility.CreateAsset<CardHandler> ();
+        ScriptableObjectUtility.CreateAsset<ScriptableCard> ();
     }
 }
