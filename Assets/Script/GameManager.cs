@@ -14,7 +14,9 @@ public class GameManager : MonoBehaviour {
     public event GenericEvent OnOpMain;
     public event GenericEvent OnOpBattle;
     public event GenericEvent OnOpEndPhase;
-
+                             
+    public event GenericEvent OnDraw;
+    public event GenericEvent OnOpDraw;
     //enum
     public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase}
     //setter
@@ -29,6 +31,8 @@ public class GameManager : MonoBehaviour {
         }
     }
     //variables
+    [SerializeField]
+    PlayerHandler player;
     Phase currentPhase;
     GenericEvent[] events = new GenericEvent[8];
 
@@ -43,11 +47,16 @@ public class GameManager : MonoBehaviour {
         events[5] += OpMain;
         events[6] += OpBattle;
         events[7] += OpEndPhase;
+
+        OnDraw += Draw;
+        OnOpDraw += OpDraw;
     }
 
     void Start()
     {
         CurrentPhase = 0;
+
+        InitGame();
     }
 
     public void NextPhase()
@@ -58,10 +67,22 @@ public class GameManager : MonoBehaviour {
             CurrentPhase = (Phase)((int)CurrentPhase + 1);
     }
 
+    //prephase
+    void InitGame()
+    {
+        player.deck = UtilityFunctions.ShuffleDeck(player.deck,player.deck.Length);
+        for (int i = 0; i < 5; i++)
+        {
+            OnDraw();
+        }
+    }
+
     //phases
     void Upkeep()
     {
         Debug.Log("UpKeep!");
+        OnDraw();
+        OnDraw();
     }
     void Main()
     {
@@ -91,5 +112,22 @@ public class GameManager : MonoBehaviour {
     void OpEndPhase()
     {
         Debug.Log("OpEndPhase!");
+    }
+
+    //functions
+    void Draw()
+    {
+        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(player.deck, player.cardsLeft);
+        if (topCard)
+        {
+            player.hands.Add(topCard);
+            Debug.Log(" - " + topCard);
+            player.cardsLeft--;
+        }
+    }
+
+    void OpDraw()
+    {
+        
     }
 }

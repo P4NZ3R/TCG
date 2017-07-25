@@ -5,9 +5,15 @@ using UnityEngine;
 public class PlayerHandler : MonoBehaviour {
     [SerializeField]
     GameManager manager;
-    [SerializeField]
-    ScriptableCard[] deck;
 
+    public ScriptableCard[] deck;
+    public List<ScriptableCard> hands = new List<ScriptableCard>();
+    public int cardsLeft;
+
+    void Awake()
+    {
+        cardsLeft = deck.Length;
+    }
 
 	// Use this for initialization
 	void Start () {
