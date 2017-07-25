@@ -4,6 +4,7 @@
 public class ScriptableCard : ScriptableObject
 {
     public string nome;
+    public Sprite image;
     public Type type;
     public Cost[] cost;
     [TextArea]

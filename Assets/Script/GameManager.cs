@@ -120,7 +120,7 @@ public class GameManager : MonoBehaviour {
         ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(player.deck, player.cardsLeft);
         if (topCard)
         {
-            player.hands.Add(topCard);
+            player.AddCardInHand(topCard);
             Debug.Log(" - " + topCard);
             player.cardsLeft--;
         }
