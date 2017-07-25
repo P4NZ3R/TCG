@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
+    public static GameManager singleton;
     //delegates
     public delegate void GenericEvent();
     //events
@@ -17,8 +18,10 @@ public class GameManager : MonoBehaviour {
                              
     public event GenericEvent OnDraw;
     public event GenericEvent OnOpDraw;
+    public event GenericEvent OnSummonPerm;
+    public event GenericEvent OnOpSummonPerm;
     //enum
-    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase}
+    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Summon}
     //setter
     Phase CurrentPhase
     {
@@ -34,11 +37,12 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
     PlayerHandler player;
     Phase currentPhase;
-    GenericEvent[] events = new GenericEvent[8];
+    public GenericEvent[] events = new GenericEvent[8];
 
     //functions
     void Awake()
     {
+        singleton = this;
         events[0] += Upkeep;
         events[1] += Main;
         events[2] += Battle;
@@ -121,7 +125,6 @@ public class GameManager : MonoBehaviour {
         if (topCard)
         {
             player.AddCardInHand(topCard);
-            Debug.Log(" - " + topCard);
             player.cardsLeft--;
         }
     }
@@ -130,4 +133,15 @@ public class GameManager : MonoBehaviour {
     {
         
     }
+
+    public void SummonPerm()
+    {
+        OnSummonPerm();
+    }
+
+    public void OpSummonPerm()
+    {
+        OnOpSummonPerm();
+    }
+
 }

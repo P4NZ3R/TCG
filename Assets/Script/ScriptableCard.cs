@@ -29,4 +29,20 @@ public class ScriptableCard : ScriptableObject
         public Elements element;
         public long amount;
     }
+
+    //
+    public Effect[] effects;
+
+    [System.Serializable]
+    public class Effect
+    {
+        public GameManager.Phase phase;
+        public EffectType type;
+        public int qnt;
+    }
+
+    public enum EffectType 
+    {
+        GainManaR,GainMandaG,GainManaB
+    }
 }

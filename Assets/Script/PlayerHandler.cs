@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHandler : MonoBehaviour {
+    public static PlayerHandler singleton;
     //
-    [SerializeField]
-    GameManager manager;
     [SerializeField]
     GameObject prefabCard;
     [SerializeField]
     GameObject handLayout;
+    [SerializeField]
+    GameObject creaturesLayout;
     //
     public ScriptableCard[] deck;
     List<ScriptableCard> hands = new List<ScriptableCard>();
+    List<ScriptableCard> creatures = new List<ScriptableCard>();
     public int cardsLeft;
 
     void Awake()
     {
+        singleton = this;
         cardsLeft = deck.Length;
     }
 
@@ -28,27 +31,45 @@ public class PlayerHandler : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Space))
-            manager.NextPhase();
+            GameManager.singleton.NextPhase();
 	}
 
     public void AddCardInHand(ScriptableCard card)
     {
         hands.Add(card);
-        RefreshHandGui();
+        RefreshGuiLayout(hands,handLayout.transform);
     }
 
-    void RefreshHandGui()
+    public void RemoveCardInHand(ScriptableCard card)
     {
-        for (int i = 0; i < handLayout.transform.childCount; i++)
+        hands.Remove(card);
+        RefreshGuiLayout(hands,handLayout.transform);
+    }
+
+    public void SummonCreature(ScriptableCard card)
+    {
+        creatures.Add(card);
+        RefreshGuiLayout(creatures,creaturesLayout.transform,false);
+//        foreach (ScriptableCard.Effect effect in card.effects)//TODO aggiungere gli effetti della carta negli eventi
+//        {
+//            if(effect.type <= 7)
+//                GameManager.singleton.events[effect.type] += 
+//        }
+        GameManager.singleton.SummonPerm();
+    }
+
+    void RefreshGuiLayout(List<ScriptableCard>list, Transform layoutGui,bool interactable=true)
+    {
+        for (int i = 0; i < layoutGui.childCount; i++)
         {
-            Destroy(handLayout.transform.GetChild(i).gameObject);
+            Destroy(layoutGui.GetChild(i).gameObject);
         }
 
-        foreach (ScriptableCard card in hands)
+        foreach (ScriptableCard card in list)
         {
             GameObject go = Instantiate(prefabCard);
-            go.transform.SetParent(handLayout.transform);
-            go.GetComponent<CardHandler>().SetCard(card);
+            go.transform.SetParent(layoutGui.transform);
+            go.GetComponent<CardHandler>().SetCard(card,interactable);
         }
     }
 }

@@ -9,9 +9,19 @@ public class CardHandler : MonoBehaviour {
     [SerializeField]
     Image img;
 
-    public void SetCard (ScriptableCard card) {
+    ScriptableCard card;
+
+    public void SetCard (ScriptableCard card,bool interactable=true) {
         cardName.text = card.nome;
         img.sprite = card.image;
-		
+        this.card = card;
+        if (!interactable)
+            GetComponent<Button>().interactable = false;
 	}
+
+    public void OnClick()
+    {
+        PlayerHandler.singleton.RemoveCardInHand(card);
+        PlayerHandler.singleton.SummonCreature(card);
+    }
 }
