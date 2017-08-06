@@ -46,18 +46,32 @@ public class PlayerHandler : MonoBehaviour {
         RefreshGuiLayout(hands,handLayout.transform);
     }
 
-    public void SummonCreature(ScriptableCard card)
+    //TODO la carta in mano viene cancellata dopo questa funzione quindi le modifiche su cardhandler non rimangono
+    //TODO on deve essere passata la delegate sullo scripable ma su cardHandler e cardhandler chiama quella sullo scripable, cosi e possibile passare i parametri
+    public void SummonCreature(ScriptableCard ScriptCard,CardHandler card)
     {
-        creatures.Add(card);
+        creatures.Add(ScriptCard);
         RefreshGuiLayout(creatures,creaturesLayout.transform,false);
-//        foreach (ScriptableCard.Effect effect in card.effects)//TODO aggiungere gli effetti della carta negli eventi
-//        {
-//            if(effect.type <= 7)
-//                GameManager.singleton.events[effect.type] += 
-//        }
+        foreach (ScriptableCard.Effect _effect in ScriptCard.effects)
+        {
+            int phase = (int)_effect.phase;
+            if (phase <= 7)
+            {
+                GameManager.singleton.events[phase] += _effect.effect.Activate;
+            }
+            else
+            {
+                if (_effect.phase == GameManager.Phase.Summon)
+                {
+                    Debug.LogError("summon effect");
+                    _effect.effect.Activate(card);
+                }
+            }
+        }
         GameManager.singleton.SummonPerm();
     }
 
+    //TODO da rifare perche non si puo settare il power alla carta visto che viene sempre cancellata
     void RefreshGuiLayout(List<ScriptableCard>list, Transform layoutGui,bool interactable=true)
     {
         for (int i = 0; i < layoutGui.childCount; i++)

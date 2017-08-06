@@ -5,50 +5,42 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
     public static GameManager singleton;
     //delegates
-    public delegate void GenericEvent();
+//    public delegate void GenericEvent();
+    public delegate void TestEvent(CardHandler card=null);
     //events
-    public event GenericEvent OnUpkeep;
-    public event GenericEvent OnMain;
-    public event GenericEvent OnBattle;
-    public event GenericEvent OnEndPhase;
-    public event GenericEvent OnOpUpkeep;
-    public event GenericEvent OnOpMain;
-    public event GenericEvent OnOpBattle;
-    public event GenericEvent OnOpEndPhase;
+    public event TestEvent OnUpkeep;
+    public event TestEvent OnMain;
+    public event TestEvent OnBattle;
+    public event TestEvent OnEndPhase;
+    public event TestEvent OnOpUpkeep;
+    public event TestEvent OnOpMain;
+    public event TestEvent OnOpBattle;
+    public event TestEvent OnOpEndPhase;
                              
-    public event GenericEvent OnDraw;
-    public event GenericEvent OnOpDraw;
-    public event GenericEvent OnSummonPerm;
-    public event GenericEvent OnOpSummonPerm;
+    public event TestEvent OnDraw;
+    public event TestEvent OnOpDraw;
+    public event TestEvent OnSummonPerm;
+    public event TestEvent OnOpSummonPerm;
     //enum
     public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Summon}
     //setter
-    Phase CurrentPhase
-    {
-        get{ return currentPhase;}
-        set
-        { 
-            currentPhase = value; 
-            if(events[(int)value]!=null)
-                events[(int)value]();
-        }
-    }
+
     //variables
     [SerializeField]
     PlayerHandler player;
     Phase currentPhase;
-    public GenericEvent[] events = new GenericEvent[8];
+    public TestEvent[] events = new TestEvent[8];
 
     //functions
     void Awake()
     {
         singleton = this;
         events[0] += Upkeep;
-        events[1] += Main;
+        events[1] += Main1;
         events[2] += Battle;
         events[3] += EndPhase;
         events[4] += OpUpkeep;
-        events[5] += OpMain;
+        events[5] += OpMain1;
         events[6] += OpBattle;
         events[7] += OpEndPhase;
 
@@ -58,17 +50,20 @@ public class GameManager : MonoBehaviour {
 
     void Start()
     {
-        CurrentPhase = 0;
+        currentPhase = 0;
 
         InitGame();
     }
 
     public void NextPhase()
     {
-        if (CurrentPhase == Phase.OpEndPhase)
-            CurrentPhase = 0;
+        if (currentPhase == Phase.OpEndPhase)
+            currentPhase = 0;
         else
-            CurrentPhase = (Phase)((int)CurrentPhase + 1);
+            currentPhase = (Phase)((int)currentPhase + 1);
+
+        if (events[(int)currentPhase] != null)
+            events[(int)currentPhase]();
     }
 
     //prephase
@@ -82,44 +77,44 @@ public class GameManager : MonoBehaviour {
     }
 
     //phases
-    void Upkeep()
+
+    void Upkeep(CardHandler card=null)
     {
         Debug.Log("UpKeep!");
         OnDraw();
-        OnDraw();
     }
-    void Main()
+    void Main1(CardHandler card=null)
     {
         Debug.Log("Main!");
     }
-    void Battle()
+    void Battle(CardHandler card=null)
     {
         Debug.Log("Battle!");
     }
-    void EndPhase()
+    void EndPhase(CardHandler card=null)
     {
         Debug.Log("EndPhase!");
     }
 
-    void OpUpkeep()
+    void OpUpkeep(CardHandler card=null)
     {
         Debug.Log("OpUpkeep!");
     }
-    void OpMain()
+    void OpMain1(CardHandler card=null)
     {
         Debug.Log("OpMain!");
     }
-    void OpBattle()
+    void OpBattle(CardHandler card=null)
     {
         Debug.Log("Opbattle!");
     }
-    void OpEndPhase()
+    void OpEndPhase(CardHandler card=null)
     {
         Debug.Log("OpEndPhase!");
     }
 
     //functions
-    void Draw()
+    public void Draw(CardHandler card=null)
     {
         ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(player.deck, player.cardsLeft);
         if (topCard)
@@ -129,19 +124,21 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void OpDraw()
+    public void OpDraw(CardHandler card=null)
     {
         
     }
 
-    public void SummonPerm()
+    public void SummonPerm(CardHandler card=null)
     {
-        OnSummonPerm();
+        if(OnSummonPerm!=null)
+            OnSummonPerm();
     }
 
-    public void OpSummonPerm()
+    public void OpSummonPerm(CardHandler card=null)
     {
-        OnOpSummonPerm();
+        if(OnOpSummonPerm!=null)
+            OnOpSummonPerm();
     }
 
 }

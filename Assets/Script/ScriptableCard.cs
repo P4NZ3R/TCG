@@ -10,8 +10,7 @@ public class ScriptableCard : ScriptableObject
     [TextArea]
     public string description;
 
-    public long health;
-    public long damage;
+    public long power;
 
     public enum Elements
     {
@@ -20,7 +19,7 @@ public class ScriptableCard : ScriptableObject
 
     public enum Type
     {
-        Pillar,Creature,Spell,Constant
+        Creature,Spell,Constant
     }
 
     [System.Serializable]
@@ -37,12 +36,6 @@ public class ScriptableCard : ScriptableObject
     public class Effect
     {
         public GameManager.Phase phase;
-        public EffectType type;
-        public int qnt;
-    }
-
-    public enum EffectType 
-    {
-        GainManaR,GainMandaG,GainManaB
+        public ScriptableEffect effect;
     }
 }

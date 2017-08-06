@@ -8,20 +8,39 @@ public class CardHandler : MonoBehaviour {
     Text cardName;
     [SerializeField]
     Image img;
+    [SerializeField]
+    Text power;
 
-    ScriptableCard card;
-
+    ScriptableCard ScriptCard;
+    int initPower;
+    int currentPower;
     public void SetCard (ScriptableCard card,bool interactable=true) {
         cardName.text = card.nome;
         img.sprite = card.image;
-        this.card = card;
+        power.text = card.power.ToString();
+        initPower = currentPower = (int)card.power;
+        this.ScriptCard = card;
         if (!interactable)
             GetComponent<Button>().interactable = false;
 	}
 
+    public bool Damage(int dmg)
+    {
+        currentPower -= dmg;
+        power.text = currentPower.ToString();
+        if (currentPower <= 0)
+            Death();
+        return currentPower <= 0;
+    }
+
     public void OnClick()
     {
-        PlayerHandler.singleton.RemoveCardInHand(card);
-        PlayerHandler.singleton.SummonCreature(card);
+        PlayerHandler.singleton.RemoveCardInHand(ScriptCard);
+        PlayerHandler.singleton.SummonCreature(ScriptCard,this);
+    }
+
+    public void Death()
+    {
+        Debug.LogError("morto");
     }
 }
