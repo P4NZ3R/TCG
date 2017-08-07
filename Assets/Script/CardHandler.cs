@@ -42,6 +42,6 @@ public class CardHandler : MonoBehaviour {
 
     public void Death()
     {
-        Debug.LogError("morto");
+        PlayerHandler.singleton.DestroyCreature(this);
     }
 }

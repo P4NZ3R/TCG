@@ -49,8 +49,6 @@ public class PlayerHandler : MonoBehaviour {
         hands.Remove(card);
     }
 
-    //TODO la carta in mano viene cancellata dopo questa funzione quindi le modifiche su cardhandler non rimangono
-    //TODO on deve essere passata la delegate sullo scripable ma su cardHandler e cardhandler chiama quella sullo scripable, cosi e possibile passare i parametri
     public void SummonCreature(CardHandler card)
     {
         ScriptableCard ScriptCard = card.ScriptCard;
@@ -73,5 +71,21 @@ public class PlayerHandler : MonoBehaviour {
             }
         }
         GameManager.singleton.SummonPerm();
+    }
+
+    public void DestroyCreature(CardHandler card)
+    {
+        creatures.Remove(card);
+
+        foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
+        {
+            int phase = (int)_effect.phase;
+            if (phase <= 7)
+            {
+                GameManager.singleton.events[phase] -= _effect.effect.Activate;
+            }
+        }
+
+        Destroy(card.gameObject);
     }
 }

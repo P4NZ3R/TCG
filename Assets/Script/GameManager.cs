@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour {
     public event TestEvent OnOpDraw;
     public event TestEvent OnSummonPerm;
     public event TestEvent OnOpSummonPerm;
+    public event TestEvent OnDestroyPerm;
+    public event TestEvent OnOpDestroyPerm;
     //enum
     public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Summon}
     //setter
@@ -139,6 +141,18 @@ public class GameManager : MonoBehaviour {
     {
         if(OnOpSummonPerm!=null)
             OnOpSummonPerm();
+    }
+
+    public void DestroyPerm(CardHandler card=null)
+    {
+        if(OnDestroyPerm!=null)
+            OnDestroyPerm();
+    }
+
+    public void OpDestroyPerm(CardHandler card=null)
+    {
+        if(OnOpDestroyPerm!=null)
+            OnOpDestroyPerm();
     }
 
 }
