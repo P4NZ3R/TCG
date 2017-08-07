@@ -32,12 +32,11 @@ public class ScriptableEffect : ScriptableObject {
     void Draw(int value)
     {
         //TODO controllo se e il giocatore o l oppo a usare l effetto
-        GameManager.singleton.Draw();
+        GameManager.singleton.Draw(GameManager.Phase.Draw);
     }
 
     void SelfDamage(int value,CardHandler card)
     {
         card.Damage(value);
-        Debug.LogError("selfDamage");
     }
 }

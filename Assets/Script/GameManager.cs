@@ -5,33 +5,18 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
     public static GameManager singleton;
     //delegates
-//    public delegate void GenericEvent();
-    public delegate void TestEvent(CardHandler card=null);
+    public delegate void GenericEvent(Phase currPhase,CardHandler card=null);
     //events
-    public event TestEvent OnUpkeep;
-    public event TestEvent OnMain;
-    public event TestEvent OnBattle;
-    public event TestEvent OnEndPhase;
-    public event TestEvent OnOpUpkeep;
-    public event TestEvent OnOpMain;
-    public event TestEvent OnOpBattle;
-    public event TestEvent OnOpEndPhase;
-                             
-    public event TestEvent OnDraw;
-    public event TestEvent OnOpDraw;
-    public event TestEvent OnSummonPerm;
-    public event TestEvent OnOpSummonPerm;
-    public event TestEvent OnDestroyPerm;
-    public event TestEvent OnOpDestroyPerm;
+    public GenericEvent[] events = new GenericEvent[14];
     //enum
-    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Summon}
+    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,SelfSummon,SelfDeath}
     //setter
 
     //variables
     [SerializeField]
     PlayerHandler player;
-    Phase currentPhase;
-    public TestEvent[] events = new TestEvent[8];
+    [HideInInspector]
+    public Phase currentPhase;
 
     //functions
     void Awake()
@@ -45,9 +30,12 @@ public class GameManager : MonoBehaviour {
         events[5] += OpMain1;
         events[6] += OpBattle;
         events[7] += OpEndPhase;
-
-        OnDraw += Draw;
-        OnOpDraw += OpDraw;
+        events[8] += Draw;
+        events[9] += OpDraw;
+        events[10] += SummonPerm;
+        events[11] += OpSummonPerm;
+        events[12] += DestroyPerm;
+        events[13] += OpDestroyPerm;
     }
 
     void Start()
@@ -65,7 +53,7 @@ public class GameManager : MonoBehaviour {
             currentPhase = (Phase)((int)currentPhase + 1);
 
         if (events[(int)currentPhase] != null)
-            events[(int)currentPhase]();
+            events[(int)currentPhase](currentPhase);
     }
 
     //prephase
@@ -74,49 +62,49 @@ public class GameManager : MonoBehaviour {
         player.deck = UtilityFunctions.ShuffleDeck(player.deck,player.deck.Length);
         for (int i = 0; i < 5; i++)
         {
-            OnDraw();
+            events[8](Phase.Draw);//Draw
         }
     }
 
     //phases
 
-    void Upkeep(CardHandler card=null)
+    void Upkeep(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("UpKeep!");
-        OnDraw();
+        events[8](Phase.Draw);//Draw
     }
-    void Main1(CardHandler card=null)
+    void Main1(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("Main!");
     }
-    void Battle(CardHandler card=null)
+    void Battle(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("Battle!");
     }
-    void EndPhase(CardHandler card=null)
+    void EndPhase(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("EndPhase!");
     }
 
-    void OpUpkeep(CardHandler card=null)
+    void OpUpkeep(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("OpUpkeep!");
     }
-    void OpMain1(CardHandler card=null)
+    void OpMain1(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("OpMain!");
     }
-    void OpBattle(CardHandler card=null)
+    void OpBattle(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("Opbattle!");
     }
-    void OpEndPhase(CardHandler card=null)
+    void OpEndPhase(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("OpEndPhase!");
     }
 
     //functions
-    public void Draw(CardHandler card=null)
+    public void Draw(Phase currPhase,CardHandler card=null)
     {
         ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(player.deck, player.cardsLeft);
         if (topCard)
@@ -124,35 +112,35 @@ public class GameManager : MonoBehaviour {
             player.AddCardInHand(topCard);
             player.cardsLeft--;
         }
+        else
+        {
+            Debug.LogError("empty deck");
+        }
     }
 
-    public void OpDraw(CardHandler card=null)
+    void OpDraw(Phase currPhase,CardHandler card=null)
     {
         
     }
 
-    public void SummonPerm(CardHandler card=null)
+    void SummonPerm(Phase currPhase,CardHandler card=null)
     {
-        if(OnSummonPerm!=null)
-            OnSummonPerm();
+        Debug.Log("summoned Perm");
     }
 
-    public void OpSummonPerm(CardHandler card=null)
+    void OpSummonPerm(Phase currPhase,CardHandler card=null)
     {
-        if(OnOpSummonPerm!=null)
-            OnOpSummonPerm();
+        
     }
 
-    public void DestroyPerm(CardHandler card=null)
+    void DestroyPerm(Phase currPhase,CardHandler card=null)
     {
-        if(OnDestroyPerm!=null)
-            OnDestroyPerm();
+        Debug.Log("Destroyed perm");
     }
 
-    public void OpDestroyPerm(CardHandler card=null)
+    void OpDestroyPerm(Phase currPhase,CardHandler card=null)
     {
-        if(OnOpDestroyPerm!=null)
-            OnOpDestroyPerm();
+        
     }
 
 }

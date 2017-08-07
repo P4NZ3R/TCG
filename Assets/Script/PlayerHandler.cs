@@ -46,6 +46,7 @@ public class PlayerHandler : MonoBehaviour {
 
     public void RemoveCardInHand(CardHandler card)
     {
+        card.Interactable(false);
         hands.Remove(card);
     }
 
@@ -57,20 +58,19 @@ public class PlayerHandler : MonoBehaviour {
         foreach (ScriptableCard.Effect _effect in ScriptCard.effects)
         {
             int phase = (int)_effect.phase;
-            if (phase <= 7)
+            if (phase <= 13)
             {
-                GameManager.singleton.events[phase] += _effect.effect.Activate;
+                GameManager.singleton.events[phase] += card.ActivateEffect;
             }
             else
             {
-                if (_effect.phase == GameManager.Phase.Summon)
+                if (_effect.phase == GameManager.Phase.SelfSummon)
                 {
-                    Debug.LogError("summon effect");
                     _effect.effect.Activate(card);
                 }
             }
         }
-        GameManager.singleton.SummonPerm();
+        GameManager.singleton.events[10](GameManager.Phase.SummonPerm);//SummonPerm
     }
 
     public void DestroyCreature(CardHandler card)
@@ -80,12 +80,19 @@ public class PlayerHandler : MonoBehaviour {
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
         {
             int phase = (int)_effect.phase;
-            if (phase <= 7)
+            if (phase <= 13)
             {
-                GameManager.singleton.events[phase] -= _effect.effect.Activate;
+                GameManager.singleton.events[phase] -= card.ActivateEffect;
+            }
+            else
+            {
+                if (_effect.phase == GameManager.Phase.SelfDeath)
+                {
+                    _effect.effect.Activate(card);
+                }
             }
         }
-
         Destroy(card.gameObject);
+        GameManager.singleton.events[12](GameManager.Phase.DestroyPerm);//DestroyPerm
     }
 }
