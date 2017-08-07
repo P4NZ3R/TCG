@@ -11,7 +11,8 @@ public class CardHandler : MonoBehaviour {
     [SerializeField]
     Text power;
 
-    ScriptableCard ScriptCard;
+    [HideInInspector]
+    public ScriptableCard ScriptCard;
     int initPower;
     int currentPower;
     public void SetCard (ScriptableCard card,bool interactable=true) {
@@ -35,8 +36,8 @@ public class CardHandler : MonoBehaviour {
 
     public void OnClick()
     {
-        PlayerHandler.singleton.RemoveCardInHand(ScriptCard);
-        PlayerHandler.singleton.SummonCreature(ScriptCard,this);
+        PlayerHandler.singleton.RemoveCardInHand(this);
+        PlayerHandler.singleton.SummonCreature(this);
     }
 
     public void Death()

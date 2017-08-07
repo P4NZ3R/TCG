@@ -13,8 +13,8 @@ public class PlayerHandler : MonoBehaviour {
     GameObject creaturesLayout;
     //
     public ScriptableCard[] deck;
-    List<ScriptableCard> hands = new List<ScriptableCard>();
-    List<ScriptableCard> creatures = new List<ScriptableCard>();
+    List<CardHandler> hands = new List<CardHandler>();
+    List<CardHandler> creatures = new List<CardHandler>();
     public int cardsLeft;
 
     void Awake()
@@ -36,22 +36,26 @@ public class PlayerHandler : MonoBehaviour {
 
     public void AddCardInHand(ScriptableCard card)
     {
-        hands.Add(card);
-        RefreshGuiLayout(hands,handLayout.transform);
+        GameObject go = Instantiate(prefabCard);
+        go.transform.SetParent(handLayout.transform);
+        CardHandler cardHandler = go.GetComponent<CardHandler>();
+        cardHandler.SetCard(card,true);
+        
+        hands.Add(cardHandler);
     }
 
-    public void RemoveCardInHand(ScriptableCard card)
+    public void RemoveCardInHand(CardHandler card)
     {
         hands.Remove(card);
-        RefreshGuiLayout(hands,handLayout.transform);
     }
 
     //TODO la carta in mano viene cancellata dopo questa funzione quindi le modifiche su cardhandler non rimangono
     //TODO on deve essere passata la delegate sullo scripable ma su cardHandler e cardhandler chiama quella sullo scripable, cosi e possibile passare i parametri
-    public void SummonCreature(ScriptableCard ScriptCard,CardHandler card)
+    public void SummonCreature(CardHandler card)
     {
-        creatures.Add(ScriptCard);
-        RefreshGuiLayout(creatures,creaturesLayout.transform,false);
+        ScriptableCard ScriptCard = card.ScriptCard;
+        creatures.Add(card);
+        card.transform.SetParent(creaturesLayout.transform);
         foreach (ScriptableCard.Effect _effect in ScriptCard.effects)
         {
             int phase = (int)_effect.phase;
@@ -69,21 +73,5 @@ public class PlayerHandler : MonoBehaviour {
             }
         }
         GameManager.singleton.SummonPerm();
-    }
-
-    //TODO da rifare perche non si puo settare il power alla carta visto che viene sempre cancellata
-    void RefreshGuiLayout(List<ScriptableCard>list, Transform layoutGui,bool interactable=true)
-    {
-        for (int i = 0; i < layoutGui.childCount; i++)
-        {
-            Destroy(layoutGui.GetChild(i).gameObject);
-        }
-
-        foreach (ScriptableCard card in list)
-        {
-            GameObject go = Instantiate(prefabCard);
-            go.transform.SetParent(layoutGui.transform);
-            go.GetComponent<CardHandler>().SetCard(card,interactable);
-        }
     }
 }
