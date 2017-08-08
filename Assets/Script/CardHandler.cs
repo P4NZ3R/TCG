@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class CardHandler : MonoBehaviour {
+public class CardHandler : MonoBehaviour,IPointerEnterHandler {
     [SerializeField]
     Text cardName;
     [SerializeField]
@@ -58,5 +59,10 @@ public class CardHandler : MonoBehaviour {
     public void Death()
     {
         PlayerHandler.singleton.DestroyCreature(this);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ShowCard.singleton.ShowSelectedCard(this);
     }
 }

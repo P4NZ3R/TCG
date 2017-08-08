@@ -6,7 +6,9 @@ public class ScriptableCard : ScriptableObject
     public string nome;
     public Sprite image;
     public Type type;
-    public Cost[] cost;
+    public Elements cost1;
+    public Elements cost2;
+    public Elements cost3;
     [TextArea]
     public string description;
 
@@ -14,19 +16,12 @@ public class ScriptableCard : ScriptableObject
 
     public enum Elements
     {
-        R,G,B
+        Null,R,G,B
     }
 
     public enum Type
     {
         Creature,Spell,Constant
-    }
-
-    [System.Serializable]
-    public class Cost
-    {
-        public Elements element;
-        public long amount;
     }
 
     //
