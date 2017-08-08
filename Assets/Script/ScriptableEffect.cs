@@ -7,7 +7,7 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,SelfDamage
+        Draw,ChangePower
     }
     public Effects effect;
     public int value;
@@ -18,10 +18,10 @@ public class ScriptableEffect : ScriptableObject {
         switch (effect)
         {
             case Effects.Draw:
-                Draw(value);
+                Draw(card,value);
                 break;
-            case Effects.SelfDamage:
-                SelfDamage(value,card);
+            case Effects.ChangePower:
+                ChangePower(value,card);
                 break;
             default:
                 Debug.LogError("no effect founded");
@@ -29,14 +29,17 @@ public class ScriptableEffect : ScriptableObject {
         }
     }
     //
-    void Draw(int value)
+    void Draw(CardHandler card,int value)
     {
-        //TODO controllo se e il giocatore o l oppo a usare l effetto
-        GameManager.singleton.Draw(GameManager.Phase.Draw);
+        if(card.playerOwner)
+            GameManager.singleton.Draw(GameManager.Phase.Draw);
+        else
+            GameManager.singleton.OpDraw(GameManager.Phase.OpDraw);
+
     }
 
-    void SelfDamage(int value,CardHandler card)
+    void ChangePower(int value,CardHandler card)
     {
-        card.Damage(value);
+        card.ChangePower(value);
     }
 }

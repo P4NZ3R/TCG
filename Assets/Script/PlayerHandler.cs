@@ -16,7 +16,7 @@ public class PlayerHandler : MonoBehaviour {
     //
     public ScriptableCard[] deck;
     List<CardHandler> hands = new List<CardHandler>();
-    List<CardHandler> creatures = new List<CardHandler>();
+    public List<CardHandler> creatures = new List<CardHandler>();
     public int cardsLeft;
     public bool canSummon=false;
 
@@ -68,6 +68,7 @@ public class PlayerHandler : MonoBehaviour {
         ScriptableCard ScriptCard = card.ScriptCard;
         creatures.Add(card);
         card.transform.SetParent(creaturesLayout.transform);
+        card.transform.SetAsFirstSibling();
         foreach (ScriptableCard.Effect _effect in ScriptCard.effects)
         {
             int phase = (int)_effect.phase;
@@ -98,6 +99,12 @@ public class PlayerHandler : MonoBehaviour {
 
     public void DestroyCreature(CardHandler card)
     {
+        if (!card)
+        {
+            Debug.LogError("no creature to destroy");
+            return;
+        }
+            
         creatures.Remove(card);
 
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)

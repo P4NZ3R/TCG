@@ -59,6 +59,9 @@ public class GameManager : MonoBehaviour {
             PlayerHandler.singletonPlayer.canSummon = true;
         else if (currentPhase == Phase.OpMain)
             PlayerHandler.singletonOpponent.canSummon = true;
+
+        if (currentPhase == Phase.Battle || currentPhase == Phase.OpBattle)
+            ResolveBattle();
     }
 
     public void RequestNextPhase()
@@ -77,7 +80,7 @@ public class GameManager : MonoBehaviour {
     {
         PlayerHandler.singletonPlayer.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonPlayer.deck,PlayerHandler.singletonPlayer.deck.Length);
         PlayerHandler.singletonOpponent.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonOpponent.deck,PlayerHandler.singletonOpponent.deck.Length);
-        for (int i = 0; i <= 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             events[8](Phase.Draw);//Draw
             events[9](Phase.OpDraw);//OpDraw
@@ -137,7 +140,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void OpDraw(Phase currPhase,CardHandler card=null)
+    public void OpDraw(Phase currPhase,CardHandler card=null)
     {
         ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonOpponent.deck, PlayerHandler.singletonOpponent.cardsLeft);
         if (topCard)
@@ -171,4 +174,30 @@ public class GameManager : MonoBehaviour {
         
     }
 
+    void ResolveBattle()
+    {
+        if (PlayerHandler.singletonPlayer.creatures.Count > 0 && PlayerHandler.singletonOpponent.creatures.Count > 0)
+        {
+            CardHandler creature = PlayerHandler.singletonPlayer.creatures[0];
+            CardHandler opCreature = PlayerHandler.singletonOpponent.creatures[0];
+            int creaturePower = creature.currentPower;
+            int opCreaturePower = opCreature.currentPower;
+            if (currentPhase == Phase.Battle)
+            {
+                if (creaturePower >= opCreaturePower)
+                {
+                    opCreature.ChangePower(-creaturePower);
+                    creature.ChangePower(-opCreaturePower);
+                }
+            }
+            else if (currentPhase == Phase.OpBattle)
+            {
+                if (opCreaturePower >= creaturePower)
+                {
+                    opCreature.ChangePower(-creaturePower);
+                    creature.ChangePower(-opCreaturePower);
+                }
+            }
+        }  
+    }
 }

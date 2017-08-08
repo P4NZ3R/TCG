@@ -17,7 +17,8 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
 
     [HideInInspector]
     public ScriptableCard ScriptCard;
-    int currentPower;
+    [HideInInspector]
+    public int currentPower;
 
     public void SetCard (ScriptableCard card,bool playerOwner=true,bool interactable=true) {
         this.playerOwner = playerOwner;
@@ -41,11 +42,12 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
         cover.SetActive(value);
     }
 
-    public bool Damage(int dmg)
+    public bool ChangePower(int value)
     {
-        currentPower -= dmg;
+        currentPower += value;
         if(power)
-        power.text = currentPower.ToString();
+            power.text = currentPower.ToString();
+        power.color = currentPower == ScriptCard.power ? Color.white : currentPower > ScriptCard.power ? Color.green : Color.red;
         if (currentPower <= 0)
             Death();
         return currentPower <= 0;
