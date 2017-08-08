@@ -38,12 +38,12 @@ public class GameManager : MonoBehaviour {
 
     void Start()
     {
-        currentPhase = 0;
-
+        currentPhase = Phase.Main;
+        PlayerHandler.singletonPlayer.canSummon = true;
         InitGame();
     }
 
-    public void NextPhase()
+    void NextPhase()
     {
         if (currentPhase == Phase.OpEndPhase)
             currentPhase = 0;
@@ -52,6 +52,24 @@ public class GameManager : MonoBehaviour {
 
         if (events[(int)currentPhase] != null)
             events[(int)currentPhase](currentPhase);
+
+        if (currentPhase != Phase.Main && currentPhase != Phase.OpMain)
+            RequestNextPhase();
+        else if (currentPhase == Phase.Main)
+            PlayerHandler.singletonPlayer.canSummon = true;
+        else if (currentPhase == Phase.OpMain)
+            PlayerHandler.singletonOpponent.canSummon = true;
+    }
+
+    public void RequestNextPhase()
+    {
+        StartCoroutine(WaitForNextPhase());
+    }
+
+    IEnumerator WaitForNextPhase()
+    {
+        yield return new WaitForSeconds(0.8f);
+        NextPhase();
     }
 
     //prephase
@@ -59,7 +77,7 @@ public class GameManager : MonoBehaviour {
     {
         PlayerHandler.singletonPlayer.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonPlayer.deck,PlayerHandler.singletonPlayer.deck.Length);
         PlayerHandler.singletonOpponent.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonOpponent.deck,PlayerHandler.singletonOpponent.deck.Length);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i <= 5; i++)
         {
             events[8](Phase.Draw);//Draw
             events[9](Phase.OpDraw);//OpDraw

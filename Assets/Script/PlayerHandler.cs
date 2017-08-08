@@ -18,6 +18,7 @@ public class PlayerHandler : MonoBehaviour {
     List<CardHandler> hands = new List<CardHandler>();
     List<CardHandler> creatures = new List<CardHandler>();
     public int cardsLeft;
+    public bool canSummon=false;
 
     void Awake()
     {
@@ -35,8 +36,14 @@ public class PlayerHandler : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKeyDown(KeyCode.Space) && !isEnemy)
-            GameManager.singleton.NextPhase();
+        if (canSummon && isEnemy && GameManager.singleton.currentPhase == GameManager.Phase.OpMain && hands.Count > 0)
+        {
+            CardHandler _card = hands[0];
+            RemoveCardInHand(_card);
+            SummonCreature(_card);
+            GameManager.singleton.RequestNextPhase();
+            canSummon = false;
+        }
 	}
 
     public void AddCardInHand(ScriptableCard card)

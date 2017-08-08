@@ -17,14 +17,14 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
 
     [HideInInspector]
     public ScriptableCard ScriptCard;
-    int initPower;
     int currentPower;
+
     public void SetCard (ScriptableCard card,bool playerOwner=true,bool interactable=true) {
         this.playerOwner = playerOwner;
         cardName.text = card.nome;
         img.sprite = card.image;
         power.text = card.power.ToString();
-        initPower = currentPower = (int)card.power;
+        currentPower = (int)card.power;
         this.ScriptCard = card;
         if (!interactable)
             GetComponent<Button>().interactable = false;
@@ -53,15 +53,12 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
 
     public void OnClick()
     {
-        if (playerOwner)
+        if (playerOwner && PlayerHandler.singletonPlayer.canSummon)
         {
+            PlayerHandler.singletonPlayer.canSummon = false;
+            GameManager.singleton.RequestNextPhase();
             PlayerHandler.singletonPlayer.RemoveCardInHand(this);
             PlayerHandler.singletonPlayer.SummonCreature(this);
-        }
-        else
-        {
-            PlayerHandler.singletonOpponent.RemoveCardInHand(this);
-            PlayerHandler.singletonOpponent.SummonCreature(this);
         }
     }
 
