@@ -13,8 +13,6 @@ public class GameManager : MonoBehaviour {
     //setter
 
     //variables
-    [SerializeField]
-    PlayerHandler player;
     [HideInInspector]
     public Phase currentPhase;
 
@@ -59,10 +57,12 @@ public class GameManager : MonoBehaviour {
     //prephase
     void InitGame()
     {
-        player.deck = UtilityFunctions.ShuffleDeck(player.deck,player.deck.Length);
+        PlayerHandler.singletonPlayer.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonPlayer.deck,PlayerHandler.singletonPlayer.deck.Length);
+        PlayerHandler.singletonOpponent.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonOpponent.deck,PlayerHandler.singletonOpponent.deck.Length);
         for (int i = 0; i < 5; i++)
         {
             events[8](Phase.Draw);//Draw
+            events[9](Phase.OpDraw);//OpDraw
         }
     }
 
@@ -89,6 +89,7 @@ public class GameManager : MonoBehaviour {
     void OpUpkeep(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("OpUpkeep!");
+        events[9](Phase.Draw);//OpDraw
     }
     void OpMain1(Phase currPhase,CardHandler card=null)
     {
@@ -106,11 +107,11 @@ public class GameManager : MonoBehaviour {
     //functions
     public void Draw(Phase currPhase,CardHandler card=null)
     {
-        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(player.deck, player.cardsLeft);
+        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonPlayer.deck, PlayerHandler.singletonPlayer.cardsLeft);
         if (topCard)
         {
-            player.AddCardInHand(topCard);
-            player.cardsLeft--;
+            PlayerHandler.singletonPlayer.AddCardInHand(topCard);
+            PlayerHandler.singletonPlayer.cardsLeft--;
         }
         else
         {
@@ -120,7 +121,16 @@ public class GameManager : MonoBehaviour {
 
     void OpDraw(Phase currPhase,CardHandler card=null)
     {
-        
+        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonOpponent.deck, PlayerHandler.singletonOpponent.cardsLeft);
+        if (topCard)
+        {
+            PlayerHandler.singletonOpponent.AddCardInHand(topCard);
+            PlayerHandler.singletonOpponent.cardsLeft--;
+        }
+        else
+        {
+            Debug.LogError("Opponent empty deck");
+        }
     }
 
     void SummonPerm(Phase currPhase,CardHandler card=null)

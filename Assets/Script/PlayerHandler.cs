@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHandler : MonoBehaviour {
-    public static PlayerHandler singleton;
+    public static PlayerHandler singletonPlayer;
+    public static PlayerHandler singletonOpponent;
     //
+    public bool isEnemy;
     [SerializeField]
     GameObject prefabCard;
     [SerializeField]
@@ -19,7 +21,10 @@ public class PlayerHandler : MonoBehaviour {
 
     void Awake()
     {
-        singleton = this;
+        if (isEnemy)
+            singletonOpponent = this;
+        else
+            singletonPlayer = this;
         cardsLeft = deck.Length;
     }
 
@@ -30,7 +35,7 @@ public class PlayerHandler : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !isEnemy)
             GameManager.singleton.NextPhase();
 	}
 
@@ -39,7 +44,7 @@ public class PlayerHandler : MonoBehaviour {
         GameObject go = Instantiate(prefabCard);
         go.transform.SetParent(handLayout.transform);
         CardHandler cardHandler = go.GetComponent<CardHandler>();
-        cardHandler.SetCard(card,true);
+        cardHandler.SetCard(card,!isEnemy,!isEnemy);
         
         hands.Add(cardHandler);
     }
@@ -47,6 +52,7 @@ public class PlayerHandler : MonoBehaviour {
     public void RemoveCardInHand(CardHandler card)
     {
         card.Interactable(false);
+        card.SetCover(false);
         hands.Remove(card);
     }
 
@@ -58,6 +64,12 @@ public class PlayerHandler : MonoBehaviour {
         foreach (ScriptableCard.Effect _effect in ScriptCard.effects)
         {
             int phase = (int)_effect.phase;
+            //controlli sul proprietario della carta per applicare gli effetti
+            if (isEnemy)
+            {
+                phase=ConvertPhaseOpponentPlayer(phase);
+            }
+            //
             if (phase <= 13)
             {
                 GameManager.singleton.events[phase] += card.ActivateEffect;
@@ -70,7 +82,11 @@ public class PlayerHandler : MonoBehaviour {
                 }
             }
         }
-        GameManager.singleton.events[10](GameManager.Phase.SummonPerm);//SummonPerm
+        if(isEnemy)
+            GameManager.singleton.events[11](GameManager.Phase.OpSummonPerm);//OpSummonPerm
+        else
+            GameManager.singleton.events[10](GameManager.Phase.SummonPerm);//SummonPerm
+
     }
 
     public void DestroyCreature(CardHandler card)
@@ -93,6 +109,34 @@ public class PlayerHandler : MonoBehaviour {
             }
         }
         Destroy(card.gameObject);
-        GameManager.singleton.events[12](GameManager.Phase.DestroyPerm);//DestroyPerm
+        if(isEnemy)
+            GameManager.singleton.events[13](GameManager.Phase.OpDestroyPerm);//OpDestroyPerm
+        else
+            GameManager.singleton.events[12](GameManager.Phase.DestroyPerm);//DestroyPerm
+
+    }
+
+    public int ConvertPhaseOpponentPlayer(int phase)
+    {
+        if (isEnemy)
+        {
+            if (phase <= 3)
+                phase += 4;
+            else if (phase <= 7)
+                phase -= 4;
+            else if (phase == 8)
+                phase = 9;
+            else if (phase == 9)
+                phase = 8;
+            else if (phase == 10)
+                phase = 11;
+            else if (phase == 11)
+                phase = 10;
+            else if (phase == 12)
+                phase = 13;
+            else if (phase == 13)
+                phase = 12;
+        }
+        return phase;
     }
 }
