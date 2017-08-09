@@ -20,7 +20,7 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
     [HideInInspector]
     public int currentPower;
 
-    public void SetCard (ScriptableCard card,bool playerOwner=true,bool interactable=true) {
+    public void SetCard (ScriptableCard card,bool playerOwner=true,bool isBot=false,bool interactable=true) {
         this.playerOwner = playerOwner;
         cardName.text = card.nome;
         img.sprite = card.image;
@@ -29,7 +29,7 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
         this.ScriptCard = card;
         if (!interactable)
             GetComponent<Button>().interactable = false;
-        SetCover(!this.playerOwner);
+        SetCover(isBot && !playerOwner);
 	}
 
     public void Interactable(bool value)
@@ -65,6 +65,13 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
             GameManager.singleton.RequestNextPhase();
             PlayerHandler.singletonPlayer.RemoveCardInHand(this);
             PlayerHandler.singletonPlayer.SummonCreature(this);
+        }
+        else if (!playerOwner && PlayerHandler.singletonOpponent.canSummon)
+        {
+            PlayerHandler.singletonOpponent.canSummon = false;
+            GameManager.singleton.RequestNextPhase();
+            PlayerHandler.singletonOpponent.RemoveCardInHand(this);
+            PlayerHandler.singletonOpponent.SummonCreature(this);
         }
     }
 

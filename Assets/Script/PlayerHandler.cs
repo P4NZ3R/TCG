@@ -76,7 +76,7 @@ public class PlayerHandler : MonoBehaviour {
         go.name = "card: "+card.nome;
         go.transform.SetParent(transform);
         CardHandler cardHandler = go.GetComponent<CardHandler>();
-        cardHandler.SetCard(card,!isEnemy,!isBot);
+        cardHandler.SetCard(card,!isEnemy,isBot,!isBot);
 
         deckLeft.Add(cardHandler);
     }

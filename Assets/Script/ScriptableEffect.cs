@@ -7,7 +7,7 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,ChangePower
+        Draw,ChangePower,Charge
     }
     public Effects effect;
     public int value;
@@ -21,7 +21,10 @@ public class ScriptableEffect : ScriptableObject {
                 Draw(card,value);
                 break;
             case Effects.ChangePower:
-                ChangePower(value,card);
+                ChangePower(card,value);
+                break;
+            case Effects.Charge:
+                Charge(card);
                 break;
             default:
                 Debug.LogError("no effect founded");
@@ -38,8 +41,23 @@ public class ScriptableEffect : ScriptableObject {
 
     }
 
-    void ChangePower(int value,CardHandler card)
+    void ChangePower(CardHandler card,int value)
     {
         card.ChangePower(value);
+    }
+
+    void Charge(CardHandler card)
+    {
+        card.transform.SetAsLastSibling();
+        if (card.playerOwner)
+        {
+            PlayerHandler.singletonPlayer.creatures.Remove(card);
+            PlayerHandler.singletonPlayer.creatures.Insert(0, card);
+        }
+        else
+        {
+            PlayerHandler.singletonOpponent.creatures.Remove(card);
+            PlayerHandler.singletonOpponent.creatures.Insert(0, card);
+        }
     }
 }
