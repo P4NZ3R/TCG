@@ -7,7 +7,7 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,ChangePower,Charge,Trample
+        Draw,ChangePower,Charge,Trample,Rampage
     }
     public Effects effect;
     public int value;
@@ -27,6 +27,9 @@ public class ScriptableEffect : ScriptableObject {
                 Charge(card);
                 break;
             case Effects.Trample:
+                Debug.LogError(effect.ToString() + " is a passive effect");
+                break;
+            case Effects.Rampage:
                 Debug.LogError(effect.ToString() + " is a passive effect");
                 break;
             default:

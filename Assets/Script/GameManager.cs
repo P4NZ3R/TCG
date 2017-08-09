@@ -200,7 +200,7 @@ public class GameManager : MonoBehaviour {
         
     }
 
-    void ResolveBattle()
+    void ResolveBattle(bool RampageBattle=false)
     {
         CardHandler creature = PlayerHandler.singletonPlayer.creatures.Count > 0 ? PlayerHandler.singletonPlayer.creatures[0] : null;
         CardHandler opCreature = PlayerHandler.singletonOpponent.creatures.Count > 0 ? PlayerHandler.singletonOpponent.creatures[0] : null;
@@ -215,12 +215,17 @@ public class GameManager : MonoBehaviour {
                 {
                     opCreature.ChangePower(-creaturePower);
                     creature.ChangePower(-opCreaturePower);
-                    //controllo se ha trample
+                    //controllo se ha trample o Rampage
                     foreach (ScriptableCard.Effect _effect in creature.ScriptCard.effects)
                     {
                         if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
                         {
                             PlayerHandler.singletonOpponent.HealthLeft -= creaturePower - opCreaturePower;
+                            break;
+                        }
+                        if (_effect.effect.effect == ScriptableEffect.Effects.Rampage && !RampageBattle)
+                        {
+                            ResolveBattle(true);
                             break;
                         }
                     }
@@ -233,12 +238,17 @@ public class GameManager : MonoBehaviour {
                     opCreature.ChangePower(-creaturePower);
                     creature.ChangePower(-opCreaturePower);
                 }
-                //controllo se ha trample
+                //controllo se ha trample o Rampage
                 foreach (ScriptableCard.Effect _effect in opCreature.ScriptCard.effects)
                 {
                     if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
                     {
                         PlayerHandler.singletonPlayer.HealthLeft -= opCreaturePower - creaturePower;
+                        break;
+                    }
+                    if (_effect.effect.effect == ScriptableEffect.Effects.Rampage && !RampageBattle)
+                    {
+                        ResolveBattle(true);
                         break;
                     }
                 }
