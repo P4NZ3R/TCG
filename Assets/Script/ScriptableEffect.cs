@@ -7,7 +7,7 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,ChangePower,Charge,Trample,Rampage
+        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth
     }
     public Effects effect;
     public int value;
@@ -31,6 +31,9 @@ public class ScriptableEffect : ScriptableObject {
                 break;
             case Effects.Rampage:
                 Debug.LogError(effect.ToString() + " is a passive effect");
+                break;
+            case Effects.ChangeHealth:
+                ChangeHealth(card,value);
                 break;
             default:
                 Debug.LogError("no effect founded");
@@ -64,6 +67,18 @@ public class ScriptableEffect : ScriptableObject {
         {
             PlayerHandler.singletonOpponent.creatures.Remove(card);
             PlayerHandler.singletonOpponent.creatures.Insert(0, card);
+        }
+    }
+
+    void ChangeHealth(CardHandler card,int value)
+    {
+        if (card.playerOwner)
+        {
+            PlayerHandler.singletonPlayer.HealthLeft += value;
+        }
+        else
+        {
+            PlayerHandler.singletonOpponent.HealthLeft += value;
         }
     }
 }
