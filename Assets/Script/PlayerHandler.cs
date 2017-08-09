@@ -1,23 +1,41 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerHandler : MonoBehaviour {
     public static PlayerHandler singletonPlayer;
     public static PlayerHandler singletonOpponent;
     //
     public bool isEnemy;
+    public bool isBot;
     [SerializeField]
     GameObject prefabCard;
     [SerializeField]
     GameObject handLayout;
     [SerializeField]
     GameObject creaturesLayout;
+    [SerializeField]
+    Text healthText;
     //
+    int healthLeft;
+    public int HealthLeft{
+        get
+        { 
+            return healthLeft;
+        }
+        set
+        {
+            healthLeft = value; 
+            healthText.text = healthLeft.ToString();
+            if (healthLeft <= 0)
+                LoseGame();
+        }
+    }
     public ScriptableCard[] deck;
-    List<CardHandler> hands = new List<CardHandler>();
+    public List<CardHandler> hand = new List<CardHandler>();
     public List<CardHandler> creatures = new List<CardHandler>();
-    public int cardsLeft;
+    public int cardsLeftInDeck;
     public bool canSummon=false;
 
     void Awake()
@@ -26,41 +44,54 @@ public class PlayerHandler : MonoBehaviour {
             singletonOpponent = this;
         else
             singletonPlayer = this;
-        cardsLeft = deck.Length;
+        cardsLeftInDeck = deck.Length;
     }
 
 	// Use this for initialization
 	void Start () {
-		
+        HealthLeft = 30;
+        if (isBot && !isEnemy && canSummon)
+            BotPlayCard();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        if (canSummon && isEnemy && GameManager.singleton.currentPhase == GameManager.Phase.OpMain && hands.Count > 0)
+        if (canSummon && isBot && hand.Count > 0)
         {
-            CardHandler _card = hands[0];
-            RemoveCardInHand(_card);
-            SummonCreature(_card);
-            GameManager.singleton.RequestNextPhase();
-            canSummon = false;
+            BotPlayCard();
         }
 	}
+
+    void BotPlayCard()
+    {
+        CardHandler _card = hand[0];
+        RemoveCardInHand(_card);
+        SummonCreature(_card);
+        GameManager.singleton.RequestNextPhase();
+        canSummon = false;
+    }
 
     public void AddCardInHand(ScriptableCard card)
     {
         GameObject go = Instantiate(prefabCard);
         go.transform.SetParent(handLayout.transform);
         CardHandler cardHandler = go.GetComponent<CardHandler>();
-        cardHandler.SetCard(card,!isEnemy,!isEnemy);
+        cardHandler.SetCard(card,!isEnemy,!isBot);
         
-        hands.Add(cardHandler);
+        hand.Add(cardHandler);
+    }
+
+    void LoseGame()
+    {
+        Debug.LogError(gameObject.name+" lose the game");
+        GameManager.singleton.gameEnded = true;
     }
 
     public void RemoveCardInHand(CardHandler card)
     {
         card.Interactable(false);
         card.SetCover(false);
-        hands.Remove(card);
+        hand.Remove(card);
     }
 
     public void SummonCreature(CardHandler card)
@@ -110,6 +141,10 @@ public class PlayerHandler : MonoBehaviour {
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
         {
             int phase = (int)_effect.phase;
+            if (isEnemy)
+            {
+                phase=ConvertPhaseOpponentPlayer(phase);
+            }
             if (phase <= 13)
             {
                 GameManager.singleton.events[phase] -= card.ActivateEffect;

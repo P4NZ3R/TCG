@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviour {
     //variables
     [HideInInspector]
     public Phase currentPhase;
-
+    [HideInInspector]
+    public bool gameEnded;
     //functions
     void Awake()
     {
@@ -45,6 +46,8 @@ public class GameManager : MonoBehaviour {
 
     void NextPhase()
     {
+        if (gameEnded)
+            return;
         if (currentPhase == Phase.OpEndPhase)
             currentPhase = 0;
         else
@@ -56,9 +59,21 @@ public class GameManager : MonoBehaviour {
         if (currentPhase != Phase.Main && currentPhase != Phase.OpMain)
             RequestNextPhase();
         else if (currentPhase == Phase.Main)
-            PlayerHandler.singletonPlayer.canSummon = true;
+        {
+            if (PlayerHandler.singletonPlayer.hand.Count > 0)
+                PlayerHandler.singletonPlayer.canSummon = true;
+            else
+                RequestNextPhase();
+        }
         else if (currentPhase == Phase.OpMain)
-            PlayerHandler.singletonOpponent.canSummon = true;
+        {
+            if (PlayerHandler.singletonOpponent.hand.Count > 0)
+                PlayerHandler.singletonOpponent.canSummon = true;
+            else
+                RequestNextPhase();
+        }
+
+
 
         if (currentPhase == Phase.Battle || currentPhase == Phase.OpBattle)
             ResolveBattle();
@@ -128,11 +143,11 @@ public class GameManager : MonoBehaviour {
     //functions
     public void Draw(Phase currPhase,CardHandler card=null)
     {
-        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonPlayer.deck, PlayerHandler.singletonPlayer.cardsLeft);
+        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonPlayer.deck, PlayerHandler.singletonPlayer.cardsLeftInDeck);
         if (topCard)
         {
             PlayerHandler.singletonPlayer.AddCardInHand(topCard);
-            PlayerHandler.singletonPlayer.cardsLeft--;
+            PlayerHandler.singletonPlayer.cardsLeftInDeck--;
         }
         else
         {
@@ -142,11 +157,11 @@ public class GameManager : MonoBehaviour {
 
     public void OpDraw(Phase currPhase,CardHandler card=null)
     {
-        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonOpponent.deck, PlayerHandler.singletonOpponent.cardsLeft);
+        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonOpponent.deck, PlayerHandler.singletonOpponent.cardsLeftInDeck);
         if (topCard)
         {
             PlayerHandler.singletonOpponent.AddCardInHand(topCard);
-            PlayerHandler.singletonOpponent.cardsLeft--;
+            PlayerHandler.singletonOpponent.cardsLeftInDeck--;
         }
         else
         {
@@ -176,10 +191,11 @@ public class GameManager : MonoBehaviour {
 
     void ResolveBattle()
     {
+        CardHandler creature = PlayerHandler.singletonPlayer.creatures.Count > 0 ? PlayerHandler.singletonPlayer.creatures[0] : null;
+        CardHandler opCreature = PlayerHandler.singletonOpponent.creatures.Count > 0 ? PlayerHandler.singletonOpponent.creatures[0] : null;
+        
         if (PlayerHandler.singletonPlayer.creatures.Count > 0 && PlayerHandler.singletonOpponent.creatures.Count > 0)
         {
-            CardHandler creature = PlayerHandler.singletonPlayer.creatures[0];
-            CardHandler opCreature = PlayerHandler.singletonOpponent.creatures[0];
             int creaturePower = creature.currentPower;
             int opCreaturePower = opCreature.currentPower;
             if (currentPhase == Phase.Battle)
@@ -198,6 +214,17 @@ public class GameManager : MonoBehaviour {
                     creature.ChangePower(-opCreaturePower);
                 }
             }
-        }  
+        }
+        else
+        {
+            if (currentPhase == Phase.Battle && PlayerHandler.singletonPlayer.creatures.Count > 0)
+            {
+                PlayerHandler.singletonOpponent.HealthLeft -= creature.currentPower;
+            }
+            else if (currentPhase == Phase.OpBattle && PlayerHandler.singletonOpponent.creatures.Count > 0)
+            {
+                PlayerHandler.singletonPlayer.HealthLeft -= opCreature.currentPower;
+            }
+        }
     }
 }

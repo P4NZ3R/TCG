@@ -44,8 +44,12 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
 
     public bool ChangePower(int value)
     {
+        if (!gameObject)
+        {
+            Debug.LogError("ehm..");
+            return false;
+        }
         currentPower += value;
-        if(power)
             power.text = currentPower.ToString();
         power.color = currentPower == ScriptCard.power ? Color.white : currentPower > ScriptCard.power ? Color.green : Color.red;
         if (currentPower <= 0)
