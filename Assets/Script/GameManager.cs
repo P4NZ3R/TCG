@@ -7,9 +7,9 @@ public class GameManager : MonoBehaviour {
     //delegates
     public delegate void GenericEvent(Phase currPhase,CardHandler card=null);
     //events
-    public GenericEvent[] events = new GenericEvent[14];
+    public GenericEvent[] events = new GenericEvent[16];
     //enum
-    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,SelfSummon,SelfDeath,Null}
+    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,Discard,OpDiscard,SelfSummon,SelfDeath,SelfDiscard,Null}
     //setter
 
     //variables
@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour {
         events[11] += OpSummonPerm;
         events[12] += DestroyPerm;
         events[13] += OpDestroyPerm;
+        events[14] += Discard;
+        events[15] += OpDiscard;
     }
 
     void Start()
@@ -187,7 +189,7 @@ public class GameManager : MonoBehaviour {
 
     void OpSummonPerm(Phase currPhase,CardHandler card=null)
     {
-        
+        Debug.Log("OpSummonPer");
     }
 
     void DestroyPerm(Phase currPhase,CardHandler card=null)
@@ -197,7 +199,17 @@ public class GameManager : MonoBehaviour {
 
     void OpDestroyPerm(Phase currPhase,CardHandler card=null)
     {
-        
+        Debug.Log("OpDestroyed perm");
+    }
+
+    void Discard(Phase currPhase,CardHandler card=null)
+    {
+        Debug.Log("Discard");
+    }
+
+    void OpDiscard(Phase currPhase,CardHandler card=null)
+    {
+        Debug.Log("OpDiscard");
     }
 
     void ResolveBattle(bool RampageBattle=false)
@@ -237,19 +249,19 @@ public class GameManager : MonoBehaviour {
                 {
                     opCreature.ChangePower(-creaturePower);
                     creature.ChangePower(-opCreaturePower);
-                }
-                //controllo se ha trample o Rampage
-                foreach (ScriptableCard.Effect _effect in opCreature.ScriptCard.effects)
-                {
-                    if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
+                    //controllo se ha trample o Rampage
+                    foreach (ScriptableCard.Effect _effect in opCreature.ScriptCard.effects)
                     {
-                        PlayerHandler.singletonPlayer.HealthLeft -= opCreaturePower - creaturePower;
-                        break;
-                    }
-                    if (_effect.effect.effect == ScriptableEffect.Effects.Rampage && !RampageBattle)
-                    {
-                        ResolveBattle(true);
-                        break;
+                        if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
+                        {
+                            PlayerHandler.singletonPlayer.HealthLeft -= opCreaturePower - creaturePower;
+                            break;
+                        }
+                        if (_effect.effect.effect == ScriptableEffect.Effects.Rampage && !RampageBattle)
+                        {
+                            ResolveBattle(true);
+                            break;
+                        }
                     }
                 }
             }

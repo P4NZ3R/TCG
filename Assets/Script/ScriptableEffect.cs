@@ -7,7 +7,7 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth
+        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,Discard
     }
     public Effects effect;
     public int value;
@@ -34,6 +34,9 @@ public class ScriptableEffect : ScriptableObject {
                 break;
             case Effects.ChangeHealth:
                 ChangeHealth(card,value);
+                break;
+            case Effects.Discard:
+                Discard(card);
                 break;
             default:
                 Debug.LogError("no effect founded");
@@ -73,12 +76,20 @@ public class ScriptableEffect : ScriptableObject {
     void ChangeHealth(CardHandler card,int value)
     {
         if (card.playerOwner)
-        {
             PlayerHandler.singletonPlayer.HealthLeft += value;
-        }
         else
-        {
             PlayerHandler.singletonOpponent.HealthLeft += value;
+    }
+
+    void Discard(CardHandler card)
+    {
+        for (int i = 0; i < value; i++)
+        {
+            if (card.playerOwner)
+                PlayerHandler.singletonPlayer.DiscardCardinHand();
+            else
+                PlayerHandler.singletonOpponent.DiscardCardinHand();
         }
     }
+
 }

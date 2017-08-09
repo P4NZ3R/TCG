@@ -64,7 +64,7 @@ public class PlayerHandler : MonoBehaviour {
     void BotPlayCard()
     {
         CardHandler _card = hand[0];
-        RemoveCardInHand(_card);
+        RemoveCardFromHand(_card);
         SummonCreature(_card);
         GameManager.singleton.RequestNextPhase();
         canSummon = false;
@@ -81,7 +81,21 @@ public class PlayerHandler : MonoBehaviour {
         deckLeft.Add(cardHandler);
     }
 
-    public void RemoveCardInDeck(CardHandler card)
+    public void DiscardCardinHand()
+    {
+        if (hand.Count <= 0)
+            return;
+        Debug.LogError("discarded "+hand[0].name);
+        CardHandler card = hand[0];
+        RemoveCardFromHand(card);
+        Destroy(card.gameObject);
+        if(isEnemy)
+            GameManager.singleton.events[15](GameManager.Phase.OpDiscard,card);
+        else
+            GameManager.singleton.events[14](GameManager.Phase.Discard,card);
+    }
+
+    public void RemoveCardFromDeck(CardHandler card)
     {
         deckLeft.Remove(card);
     }
@@ -89,7 +103,7 @@ public class PlayerHandler : MonoBehaviour {
     public void AddCardInHand(CardHandler card)
     {
         card.transform.SetParent(handLayout.transform);
-//        card.transform.SetAsLastSibling();
+        card.transform.SetAsFirstSibling();
 
         hand.Add(card);
     }
@@ -100,7 +114,7 @@ public class PlayerHandler : MonoBehaviour {
         GameManager.singleton.gameEnded = true;
     }
 
-    public void RemoveCardInHand(CardHandler card)
+    public void RemoveCardFromHand(CardHandler card)
     {
         card.Interactable(false);
         card.SetCover(false);
@@ -122,7 +136,7 @@ public class PlayerHandler : MonoBehaviour {
                 phase=ConvertPhaseOpponentPlayer(phase);
             }
             //
-            if (phase <= 13)
+            if (phase <= 15)
             {
                 GameManager.singleton.events[phase] += card.ActivateEffect;
             }
@@ -158,7 +172,7 @@ public class PlayerHandler : MonoBehaviour {
             {
                 phase=ConvertPhaseOpponentPlayer(phase);
             }
-            if (phase <= 13)
+            if (phase <= 15)
             {
                 GameManager.singleton.events[phase] -= card.ActivateEffect;
             }
@@ -198,6 +212,10 @@ public class PlayerHandler : MonoBehaviour {
                 phase = 13;
             else if (phase == 13)
                 phase = 12;
+            else if (phase == 14)
+                phase = 15;
+            else if (phase == 15)
+                phase = 14;
         }
         return phase;
     }

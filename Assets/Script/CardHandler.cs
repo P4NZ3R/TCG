@@ -63,14 +63,14 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
         {
             PlayerHandler.singletonPlayer.canSummon = false;
             GameManager.singleton.RequestNextPhase();
-            PlayerHandler.singletonPlayer.RemoveCardInHand(this);
+            PlayerHandler.singletonPlayer.RemoveCardFromHand(this);
             PlayerHandler.singletonPlayer.SummonCreature(this);
         }
         else if (!playerOwner && PlayerHandler.singletonOpponent.canSummon)
         {
             PlayerHandler.singletonOpponent.canSummon = false;
             GameManager.singleton.RequestNextPhase();
-            PlayerHandler.singletonOpponent.RemoveCardInHand(this);
+            PlayerHandler.singletonOpponent.RemoveCardFromHand(this);
             PlayerHandler.singletonOpponent.SummonCreature(this);
         }
     }
