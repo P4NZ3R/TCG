@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour {
     //events
     public GenericEvent[] events = new GenericEvent[14];
     //enum
-    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,SelfSummon,SelfDeath}
+    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,SelfSummon,SelfDeath,Null}
     //setter
 
     //variables
@@ -215,6 +215,15 @@ public class GameManager : MonoBehaviour {
                 {
                     opCreature.ChangePower(-creaturePower);
                     creature.ChangePower(-opCreaturePower);
+                    //controllo se ha trample
+                    foreach (ScriptableCard.Effect _effect in creature.ScriptCard.effects)
+                    {
+                        if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
+                        {
+                            PlayerHandler.singletonOpponent.HealthLeft -= creaturePower - opCreaturePower;
+                            break;
+                        }
+                    }
                 }
             }
             else if (currentPhase == Phase.OpBattle)
@@ -223,6 +232,15 @@ public class GameManager : MonoBehaviour {
                 {
                     opCreature.ChangePower(-creaturePower);
                     creature.ChangePower(-opCreaturePower);
+                }
+                //controllo se ha trample
+                foreach (ScriptableCard.Effect _effect in opCreature.ScriptCard.effects)
+                {
+                    if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
+                    {
+                        PlayerHandler.singletonPlayer.HealthLeft -= opCreaturePower - creaturePower;
+                        break;
+                    }
                 }
             }
         }
