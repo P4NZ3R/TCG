@@ -33,9 +33,9 @@ public class PlayerHandler : MonoBehaviour {
         }
     }
     public ScriptableCard[] deck;
+    public List<CardHandler> deckLeft = new List<CardHandler>();
     public List<CardHandler> hand = new List<CardHandler>();
     public List<CardHandler> creatures = new List<CardHandler>();
-    public int cardsLeftInDeck;
     public bool canSummon=false;
 
     void Awake()
@@ -44,7 +44,6 @@ public class PlayerHandler : MonoBehaviour {
             singletonOpponent = this;
         else
             singletonPlayer = this;
-        cardsLeftInDeck = deck.Length;
     }
 
 	// Use this for initialization
@@ -71,14 +70,28 @@ public class PlayerHandler : MonoBehaviour {
         canSummon = false;
     }
 
-    public void AddCardInHand(ScriptableCard card)
+    public void AddCardInDeck(ScriptableCard card)
     {
         GameObject go = Instantiate(prefabCard);
-        go.transform.SetParent(handLayout.transform);
+        go.name = "card: "+card.nome;
+        go.transform.SetParent(transform);
         CardHandler cardHandler = go.GetComponent<CardHandler>();
         cardHandler.SetCard(card,!isEnemy,!isBot);
-        
-        hand.Add(cardHandler);
+
+        deckLeft.Add(cardHandler);
+    }
+
+    public void RemoveCardInDeck(CardHandler card)
+    {
+        deckLeft.Remove(card);
+    }
+
+    public void AddCardInHand(CardHandler card)
+    {
+        card.transform.SetParent(handLayout.transform);
+//        card.transform.SetAsLastSibling();
+
+        hand.Add(card);
     }
 
     void LoseGame()

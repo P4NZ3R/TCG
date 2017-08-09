@@ -40,8 +40,8 @@ public class GameManager : MonoBehaviour {
     void Start()
     {
         currentPhase = Phase.Main;
-        PlayerHandler.singletonPlayer.canSummon = true;
         InitGame();
+        PlayerHandler.singletonPlayer.canSummon = true;
     }
 
     void NextPhase()
@@ -93,8 +93,19 @@ public class GameManager : MonoBehaviour {
     //prephase
     void InitGame()
     {
+        //player shuffle deck and add it to deckleft
         PlayerHandler.singletonPlayer.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonPlayer.deck,PlayerHandler.singletonPlayer.deck.Length);
+        foreach (ScriptableCard card in PlayerHandler.singletonPlayer.deck)
+        {
+            PlayerHandler.singletonPlayer.AddCardInDeck(card);
+        }
+        //op shuffle deck and add it to deckleft
         PlayerHandler.singletonOpponent.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonOpponent.deck,PlayerHandler.singletonOpponent.deck.Length);
+        foreach (ScriptableCard card in PlayerHandler.singletonOpponent.deck)
+        {
+            PlayerHandler.singletonOpponent.AddCardInDeck(card);
+        }
+        //both draw cards
         for (int i = 0; i < 5; i++)
         {
             events[8](Phase.Draw);//Draw
@@ -143,29 +154,29 @@ public class GameManager : MonoBehaviour {
     //functions
     public void Draw(Phase currPhase,CardHandler card=null)
     {
-        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonPlayer.deck, PlayerHandler.singletonPlayer.cardsLeftInDeck);
+        CardHandler topCard = PlayerHandler.singletonPlayer.deckLeft.Count>0 ? PlayerHandler.singletonPlayer.deckLeft[0] : null;
         if (topCard)
         {
+            PlayerHandler.singletonPlayer.deckLeft.Remove(topCard);
             PlayerHandler.singletonPlayer.AddCardInHand(topCard);
-            PlayerHandler.singletonPlayer.cardsLeftInDeck--;
         }
         else
         {
-            Debug.LogError("empty deck");
+            Debug.LogWarning("empty deck");
         }
     }
 
     public void OpDraw(Phase currPhase,CardHandler card=null)
     {
-        ScriptableCard topCard = UtilityFunctions.GetTopCardOfDeck(PlayerHandler.singletonOpponent.deck, PlayerHandler.singletonOpponent.cardsLeftInDeck);
+        CardHandler topCard = PlayerHandler.singletonOpponent.deckLeft.Count>0 ? PlayerHandler.singletonOpponent.deckLeft[0] : null;
         if (topCard)
         {
+            PlayerHandler.singletonOpponent.deckLeft.Remove(topCard);
             PlayerHandler.singletonOpponent.AddCardInHand(topCard);
-            PlayerHandler.singletonOpponent.cardsLeftInDeck--;
         }
         else
         {
-            Debug.LogError("Opponent empty deck");
+            Debug.LogWarning("Opponent empty deck");
         }
     }
 

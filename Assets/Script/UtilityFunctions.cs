@@ -15,9 +15,4 @@ public static class UtilityFunctions {
         }
         return deck;
     }
-
-    public static ScriptableCard GetTopCardOfDeck(ScriptableCard[] deck,int cardsLeft)
-    {
-        return cardsLeft > 0 ? deck[cardsLeft-1] : null;
-    }
 }
