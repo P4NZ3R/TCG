@@ -15,4 +15,28 @@ public static class UtilityFunctions {
         }
         return deck;
     }
+
+    public static ScriptableEffect SearchEffect(ScriptableCard card,ScriptableEffect.Effects effect)
+    {
+        foreach (ScriptableCard.Effect _effect in card.effects)
+        {
+            if (_effect.effect.effect == effect)
+            {
+                return _effect.effect;
+            }
+        }
+        return null;
+    }
+
+    public static ScriptableEffect SearchEffectPhase(ScriptableCard card,GameManager.Phase phase)
+    {
+        foreach (ScriptableCard.Effect _effect in card.effects)
+        {
+            if (_effect.phase == phase)
+            {
+                return _effect.effect;
+            }
+        }
+        return null;
+    }
 }
