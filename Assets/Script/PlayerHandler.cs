@@ -84,13 +84,11 @@ public class PlayerHandler : MonoBehaviour {
     {
         if (hand.Count <= 0)
             return;
-        Debug.LogError("discarded "+hand[0].name);
 
         CardHandler card = hand[0];
         ScriptableEffect _effect = UtilityFunctions.SearchEffectPhase(card.ScriptCard, GameManager.Phase.SelfDiscard);
         if (_effect != null)
         {
-            Debug.LogError("asdas");
             _effect.Activate(card);
         }
             
