@@ -7,10 +7,11 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,Discard
+        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp
     }
     public Effects effect;
     public int value;
+    public ScriptableCard linkedCard;
 
     //
     public void Activate(CardHandler card)
@@ -35,8 +36,17 @@ public class ScriptableEffect : ScriptableObject {
             case Effects.ChangeHealth:
                 ChangeHealth(card,value);
                 break;
+            case Effects.ChangeHealthOp:
+                ChangeHealthOp(card,value);
+                break;
             case Effects.Discard:
                 Discard(card);
+                break;
+            case Effects.Summon:
+                Summon(card);
+                break;
+            case Effects.SummonOp:
+                SummonOp(card);
                 break;
             default:
                 Debug.LogError("no effect founded");
@@ -81,6 +91,14 @@ public class ScriptableEffect : ScriptableObject {
             PlayerHandler.singletonOpponent.HealthLeft += value;
     }
 
+    void ChangeHealthOp(CardHandler card,int value)
+    {
+        if (card.playerOwner)
+            PlayerHandler.singletonOpponent.HealthLeft += value;
+        else
+            PlayerHandler.singletonPlayer.HealthLeft += value;
+    }
+
     void Discard(CardHandler card)
     {
         for (int i = 0; i < value; i++)
@@ -92,4 +110,23 @@ public class ScriptableEffect : ScriptableObject {
         }
     }
 
+    void Summon(CardHandler card)
+    {
+        CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
+        linkedCardHandler.SetCard(linkedCard,card.playerOwner,false,false);
+        if (card.playerOwner)
+            PlayerHandler.singletonPlayer.SummonCreature(linkedCardHandler);
+        else
+            PlayerHandler.singletonOpponent.SummonCreature(linkedCardHandler);
+    }
+
+    void SummonOp(CardHandler card)
+    {
+        CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
+        linkedCardHandler.SetCard(linkedCard,!card.playerOwner,false,false);
+        if (card.playerOwner)
+            PlayerHandler.singletonOpponent.SummonCreature(linkedCardHandler);
+        else
+            PlayerHandler.singletonPlayer.SummonCreature(linkedCardHandler);
+    }
 }

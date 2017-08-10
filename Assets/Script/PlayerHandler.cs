@@ -9,8 +9,7 @@ public class PlayerHandler : MonoBehaviour {
     //
     public bool isEnemy;
     public bool isBot;
-    [SerializeField]
-    GameObject prefabCard;
+    public GameObject prefabCard;
     [SerializeField]
     GameObject handLayout;
     [SerializeField]

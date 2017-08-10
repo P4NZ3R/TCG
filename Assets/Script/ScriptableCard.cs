@@ -3,6 +3,7 @@
 [CreateAssetMenu]
 public class ScriptableCard : ScriptableObject
 {
+    public bool isCollectable=true;
     public string nome;
     public Sprite image;
     public Type type;
