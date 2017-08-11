@@ -85,8 +85,28 @@ public class PlayerHandler : MonoBehaviour {
         go.transform.SetParent(transform);
         CardHandler cardHandler = go.GetComponent<CardHandler>();
         cardHandler.SetCard(card,!isEnemy,isBot,!isBot);
-
         deckLeft.Add(cardHandler);
+
+        foreach (ScriptableCard.Effect _effect in card.effects)
+        {
+            if (_effect.phase == GameManager.Phase.UpkeepDeck)
+            {
+                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= cardHandler.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
+                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] += cardHandler.ActivateEffect;
+            }
+        }
+    }
+
+    public void RemoveCardFromDeck(CardHandler card)
+    {
+        deckLeft.Remove(card);
+        foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
+        {
+            if (_effect.phase == GameManager.Phase.UpkeepDeck)
+            {
+                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= card.ActivateEffect;
+            }
+        }
     }
 
     public void DiscardCardinHand()
@@ -110,17 +130,36 @@ public class PlayerHandler : MonoBehaviour {
             GameManager.singleton.events[14](GameManager.Phase.Discard,card);
     }
 
-    public void RemoveCardFromDeck(CardHandler card)
-    {
-        deckLeft.Remove(card);
-    }
 
     public void AddCardInHand(CardHandler card)
     {
         card.transform.SetParent(handLayout.transform);
         card.transform.SetAsFirstSibling();
-
         hand.Add(card);
+
+        foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
+        {
+            if (_effect.phase == GameManager.Phase.UpkeepHand)
+            {
+                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= card.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
+                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] += card.ActivateEffect;
+            }
+        }
+    }
+
+    public void RemoveCardFromHand(CardHandler card)
+    {
+        card.Interactable(false);
+        card.SetCover(false);
+        hand.Remove(card);
+
+        foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
+        {
+            if (_effect.phase == GameManager.Phase.UpkeepHand)
+            {
+                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= card.ActivateEffect;
+            }
+        }
     }
 
     void LoseGame()
@@ -129,12 +168,6 @@ public class PlayerHandler : MonoBehaviour {
         GameManager.singleton.gameEnded = true;
     }
 
-    public void RemoveCardFromHand(CardHandler card)
-    {
-        card.Interactable(false);
-        card.SetCover(false);
-        hand.Remove(card);
-    }
 
     public void SummonCreature(CardHandler card)
     {
@@ -230,6 +263,8 @@ public class PlayerHandler : MonoBehaviour {
                 phase = 12;
             else if (phase == 14)
                 phase = 15;
+            else if (phase == 15)
+                phase = 14;
             else if (phase == 15)
                 phase = 14;
         }

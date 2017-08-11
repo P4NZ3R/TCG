@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour {
     //events
     public GenericEvent[] events = new GenericEvent[16];
     //enum
-    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,Discard,OpDiscard,SelfSummon,SelfDeath,SelfDiscard,Null}
+    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,Discard,OpDiscard,SelfSummon,SelfDeath,SelfDiscard,Null,UpkeepDeck,UpkeepHand}
     //setter
 
     //variables
@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour {
         CardHandler topCard = PlayerHandler.singletonPlayer.deckLeft.Count>0 ? PlayerHandler.singletonPlayer.deckLeft[0] : null;
         if (topCard)
         {
-            PlayerHandler.singletonPlayer.deckLeft.Remove(topCard);
+            PlayerHandler.singletonPlayer.RemoveCardFromDeck(topCard);
             PlayerHandler.singletonPlayer.AddCardInHand(topCard);
         }
         else
@@ -178,7 +178,7 @@ public class GameManager : MonoBehaviour {
         CardHandler topCard = PlayerHandler.singletonOpponent.deckLeft.Count>0 ? PlayerHandler.singletonOpponent.deckLeft[0] : null;
         if (topCard)
         {
-            PlayerHandler.singletonOpponent.deckLeft.Remove(topCard);
+            PlayerHandler.singletonOpponent.RemoveCardFromDeck(topCard);
             PlayerHandler.singletonOpponent.AddCardInHand(topCard);
         }
         else
