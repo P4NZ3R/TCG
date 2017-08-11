@@ -7,7 +7,7 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp,DrawOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf,RevealCardInHand
+        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp,DrawOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf,RevealCardInHand,AddCreatureInHand,AddCreatureInHandOp
     }
     public Effects effect;
     public int value=1;
@@ -62,6 +62,12 @@ public class ScriptableEffect : ScriptableObject {
                 break;
             case Effects.RevealCardInHand:
                 RevealInHand(card);
+                break;
+            case Effects.AddCreatureInHand:
+                AddCreatureInHand(card);
+                break;
+            case Effects.AddCreatureInHandOp:
+                AddCreatureInHandOp(card);
                 break;
             default:
                 Debug.LogError("no effect founded");
@@ -199,5 +205,45 @@ public class ScriptableEffect : ScriptableObject {
     void RevealInHand(CardHandler card)
     {
         card.SetCover(false);
+    }
+
+    void AddCreatureInHand(CardHandler card)
+    {
+        GameObject go = Instantiate(PlayerHandler.singletonPlayer.prefabCard);
+        go.name = "card: "+card.ScriptCard.nome;
+        CardHandler cardHandler = go.GetComponent<CardHandler>();
+        for (int i = 0; i < value; i++)
+        {
+            if (card.playerOwner)
+            {
+                cardHandler.SetCard(linkedCard,!PlayerHandler.singletonPlayer.isEnemy,PlayerHandler.singletonPlayer.isBot,!PlayerHandler.singletonPlayer.isBot);
+                PlayerHandler.singletonPlayer.AddCardInHand(cardHandler);
+            }
+            else
+            {
+                cardHandler.SetCard(linkedCard,!PlayerHandler.singletonOpponent.isEnemy,PlayerHandler.singletonOpponent.isBot,!PlayerHandler.singletonOpponent.isBot);
+                PlayerHandler.singletonOpponent.AddCardInHand(cardHandler);
+            }
+        }
+    }
+
+    void AddCreatureInHandOp(CardHandler card)
+    {
+        GameObject go = Instantiate(PlayerHandler.singletonPlayer.prefabCard);
+        go.name = "card: "+card.ScriptCard.nome;
+        CardHandler cardHandler = go.GetComponent<CardHandler>();
+        for (int i = 0; i < value; i++)
+        {
+            if (card.playerOwner)
+            {
+                cardHandler.SetCard(linkedCard,!PlayerHandler.singletonOpponent.isEnemy,PlayerHandler.singletonOpponent.isBot,!PlayerHandler.singletonOpponent.isBot);
+                PlayerHandler.singletonOpponent.AddCardInHand(cardHandler);
+            }
+            else
+            {
+                cardHandler.SetCard(linkedCard, !PlayerHandler.singletonPlayer.isEnemy, PlayerHandler.singletonPlayer.isBot, !PlayerHandler.singletonPlayer.isBot);
+                PlayerHandler.singletonPlayer.AddCardInHand(cardHandler);
+            }
+        }
     }
 }
