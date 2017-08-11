@@ -94,6 +94,8 @@ public class GameManager : MonoBehaviour {
     IEnumerator WaitForNextPhase()
     {
         yield return new WaitForSeconds(0.8f);
+        if(currentPhase==Phase.Main || currentPhase==Phase.OpMain)
+            yield return new WaitForSeconds(1f);
         NextPhase();
     }
 
@@ -101,13 +103,11 @@ public class GameManager : MonoBehaviour {
     void InitGame()
     {
         //player shuffle deck and add it to deckleft
-//        PlayerHandler.singletonPlayer.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonPlayer.deck,PlayerHandler.singletonPlayer.deck.Length);
         foreach (ScriptableCard card in PlayerHandler.singletonPlayer.deck)
         {
             PlayerHandler.singletonPlayer.AddCardInDeck(card);
         }
         //op shuffle deck and add it to deckleft
-//        PlayerHandler.singletonOpponent.deck = UtilityFunctions.ShuffleDeck(PlayerHandler.singletonOpponent.deck,PlayerHandler.singletonOpponent.deck.Length);
         foreach (ScriptableCard card in PlayerHandler.singletonOpponent.deck)
         {
             PlayerHandler.singletonOpponent.AddCardInDeck(card);
