@@ -16,6 +16,8 @@ public class PlayerHandler : MonoBehaviour {
     GameObject creaturesLayout;
     [SerializeField]
     Text healthText;
+    [SerializeField]
+    Text deckCounter;
     //
     int healthLeft;
     public int HealthLeft{
@@ -27,6 +29,7 @@ public class PlayerHandler : MonoBehaviour {
         {
             healthLeft = value; 
             healthText.text = healthLeft.ToString();
+            healthText.color = healthLeft >= 20 ? Color.black : healthLeft >= 10 ? Color.yellow : Color.red;
             if (healthLeft <= 0)
                 LoseGame();
         }
@@ -96,6 +99,8 @@ public class PlayerHandler : MonoBehaviour {
                 GameManager.singleton.events[(int)phaseTrigger] += cardHandler.ActivateEffect;
             }
         }
+        deckCounter.text = deckLeft.Count.ToString();
+        deckCounter.color = deckLeft.Count > 0 ? Color.black : Color.red;
     }
 
     public void RemoveCardFromDeck(CardHandler card)
@@ -109,6 +114,8 @@ public class PlayerHandler : MonoBehaviour {
                 GameManager.singleton.events[(int)phaseTrigger] -= card.ActivateEffect;
             }
         }
+        deckCounter.text = deckLeft.Count.ToString();
+        deckCounter.color = deckLeft.Count > 0 ? Color.black : Color.red;
     }
 
     public void DiscardCardinHand()

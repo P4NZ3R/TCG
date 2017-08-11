@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
     public static GameManager singleton;
@@ -13,6 +14,15 @@ public class GameManager : MonoBehaviour {
     //setter
 
     //variables
+    [SerializeField]
+    Text upkeepText;
+    [SerializeField]
+    Text mainText;
+    [SerializeField]
+    Text battleText;
+    [SerializeField]
+    Text endphaseText;
+
     [HideInInspector]
     public Phase currentPhase;
     [HideInInspector]
@@ -80,8 +90,26 @@ public class GameManager : MonoBehaviour {
                 RequestNextPhase();
         }
 
+        //grafica temporanea
+        upkeepText.transform.parent.GetComponent<Image>().color = 
+        mainText.transform.parent.GetComponent<Image>().color = 
+        battleText.transform.parent.GetComponent<Image>().color = 
+        endphaseText.transform.parent.GetComponent<Image>().color = Color.white;
+                        
+        if (currentPhase == Phase.Upkeep || currentPhase == Phase.OpUpkeep)
+            upkeepText.transform.parent.GetComponent<Image>().color = Color.gray;
+        else if (currentPhase == Phase.Main || currentPhase == Phase.OpMain)
+            mainText.transform.parent.GetComponent<Image>().color = Color.gray;
+        else if (currentPhase == Phase.Battle || currentPhase == Phase.OpBattle)
+            battleText.transform.parent.GetComponent<Image>().color = Color.gray;
+        else if (currentPhase == Phase.EndPhase || currentPhase == Phase.OpEndPhase)
+            endphaseText.transform.parent.GetComponent<Image>().color = Color.gray;
 
-
+        if (currentPhase == Phase.Upkeep)
+            upkeepText.color = mainText.color = battleText.color = endphaseText.color = Color.blue;
+        else if (currentPhase == Phase.OpUpkeep)
+            upkeepText.color = mainText.color = battleText.color = endphaseText.color = Color.red;
+        //
         if (currentPhase == Phase.Battle || currentPhase == Phase.OpBattle)
             ResolveBattle();
     }
@@ -93,9 +121,9 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator WaitForNextPhase()
     {
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(1f);
         if(currentPhase==Phase.Main || currentPhase==Phase.OpMain)
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(2f);
         NextPhase();
     }
 
