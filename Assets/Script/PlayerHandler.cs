@@ -147,6 +147,8 @@ public class PlayerHandler : MonoBehaviour {
                 GameManager.singleton.events[(int)phaseTrigger] -= card.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
                 GameManager.singleton.events[(int)phaseTrigger] += card.ActivateEffect;
             }
+            else if (_effect.effect.effect == ScriptableEffect.Effects.RevealCardInHand)
+                _effect.effect.Activate(card);
         }
     }
 

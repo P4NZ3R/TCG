@@ -7,7 +7,7 @@ public class ScriptableEffect : ScriptableObject {
 
     public enum Effects
     {
-        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp,DrawOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf
+        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp,DrawOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf,RevealCardInHand
     }
     public Effects effect;
     public int value=1;
@@ -59,6 +59,9 @@ public class ScriptableEffect : ScriptableObject {
                 break;
             case Effects.DestroySelf:
                 DestroySelf(card);
+                break;
+            case Effects.RevealCardInHand:
+                RevealInHand(card);
                 break;
             default:
                 Debug.LogError("no effect founded");
@@ -191,5 +194,10 @@ public class ScriptableEffect : ScriptableObject {
             PlayerHandler.singletonPlayer.DestroyCreature(card);
         else
             PlayerHandler.singletonOpponent.DestroyCreature(card);
+    }
+
+    void RevealInHand(CardHandler card)
+    {
+        card.SetCover(false);
     }
 }
