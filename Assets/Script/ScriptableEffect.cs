@@ -52,10 +52,10 @@ public class ScriptableEffect : ScriptableObject {
                 SummonOp(card);
                 break;
             case Effects.AddCreatureInDeck:
-                AddCreatureOnDeck(card);
+                AddCreatureInDeck(card);
                 break;
             case Effects.AddCreatureInDeckOp:
-                AddCreatureOnDeckOp(card);
+                AddCreatureInDeckOp(card);
                 break;
             case Effects.DestroySelf:
                 DestroySelf(card);
@@ -163,7 +163,7 @@ public class ScriptableEffect : ScriptableObject {
         }
     }
 
-    void AddCreatureOnDeck(CardHandler card)
+    void AddCreatureInDeck(CardHandler card)
     {
         for (int i = 0; i < value; i++)
         {
@@ -174,7 +174,7 @@ public class ScriptableEffect : ScriptableObject {
         }
     }
 
-    void AddCreatureOnDeckOp(CardHandler card)
+    void AddCreatureInDeckOp(CardHandler card)
     {
         for (int i = 0; i < value; i++)
         {

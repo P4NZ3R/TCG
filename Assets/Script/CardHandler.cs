@@ -85,9 +85,9 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
             if (phase == (int)_effect.phase)
                 _effect.effect.Activate(this);
             //devo controllare il padre perche senno gli effetti Hand e Deck se presenti entrambi triggerano assieme
-            else if (currPhase == GameManager.Phase.Upkeep && _effect.phase == GameManager.Phase.UpkeepHand && transform.parent.name.Contains("Hand"))
+            else if (phase == (int)GameManager.Phase.Upkeep && _effect.phase == GameManager.Phase.UpkeepHand && transform.parent.name.Contains("Hand"))
                 _effect.effect.Activate(this);
-            else if (currPhase == GameManager.Phase.Upkeep && _effect.phase == GameManager.Phase.UpkeepDeck && transform.parent.name.Contains("Deck"))
+            else if (phase == (int)GameManager.Phase.Upkeep && _effect.phase == GameManager.Phase.UpkeepDeck && transform.parent.name.Contains("Deck"))
                 _effect.effect.Activate(this);
         }
     }

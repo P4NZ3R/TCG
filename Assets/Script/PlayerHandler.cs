@@ -85,14 +85,15 @@ public class PlayerHandler : MonoBehaviour {
         go.transform.SetParent(transform);
         CardHandler cardHandler = go.GetComponent<CardHandler>();
         cardHandler.SetCard(card,!isEnemy,isBot,!isBot);
-        deckLeft.Add(cardHandler);
+        deckLeft.Insert(Random.Range(0,deckLeft.Count-1),cardHandler);
 
+        GameManager.Phase phaseTrigger = isEnemy ? GameManager.Phase.OpUpkeep : GameManager.Phase.Upkeep;
         foreach (ScriptableCard.Effect _effect in card.effects)
         {
             if (_effect.phase == GameManager.Phase.UpkeepDeck)
             {
-                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= cardHandler.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
-                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] += cardHandler.ActivateEffect;
+                GameManager.singleton.events[(int)phaseTrigger] -= cardHandler.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
+                GameManager.singleton.events[(int)phaseTrigger] += cardHandler.ActivateEffect;
             }
         }
     }
@@ -100,11 +101,12 @@ public class PlayerHandler : MonoBehaviour {
     public void RemoveCardFromDeck(CardHandler card)
     {
         deckLeft.Remove(card);
+        GameManager.Phase phaseTrigger = isEnemy ? GameManager.Phase.OpUpkeep : GameManager.Phase.Upkeep;
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
         {
             if (_effect.phase == GameManager.Phase.UpkeepDeck)
             {
-                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= card.ActivateEffect;
+                GameManager.singleton.events[(int)phaseTrigger] -= card.ActivateEffect;
             }
         }
     }
@@ -137,12 +139,13 @@ public class PlayerHandler : MonoBehaviour {
         card.transform.SetAsFirstSibling();
         hand.Add(card);
 
+        GameManager.Phase phaseTrigger = isEnemy ? GameManager.Phase.OpUpkeep : GameManager.Phase.Upkeep;
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
         {
             if (_effect.phase == GameManager.Phase.UpkeepHand)
             {
-                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= card.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
-                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] += card.ActivateEffect;
+                GameManager.singleton.events[(int)phaseTrigger] -= card.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
+                GameManager.singleton.events[(int)phaseTrigger] += card.ActivateEffect;
             }
         }
     }
@@ -153,11 +156,12 @@ public class PlayerHandler : MonoBehaviour {
         card.SetCover(false);
         hand.Remove(card);
 
+        GameManager.Phase phaseTrigger = isEnemy ? GameManager.Phase.OpUpkeep : GameManager.Phase.Upkeep;
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
         {
             if (_effect.phase == GameManager.Phase.UpkeepHand)
             {
-                GameManager.singleton.events[(int)GameManager.Phase.Upkeep] -= card.ActivateEffect;
+                GameManager.singleton.events[(int)phaseTrigger] -= card.ActivateEffect;
             }
         }
     }
