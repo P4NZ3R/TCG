@@ -144,6 +144,7 @@ public class PlayerHandler : MonoBehaviour {
             //
             if (phase <= 15)
             {
+                GameManager.singleton.events[phase] -= card.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
                 GameManager.singleton.events[phase] += card.ActivateEffect;
             }
             else
