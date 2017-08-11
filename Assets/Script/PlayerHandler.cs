@@ -34,8 +34,6 @@ public class PlayerHandler : MonoBehaviour {
                 LoseGame();
         }
     }
-    [SerializeField]
-    ScriptableDeck deckScriptable;
     [HideInInspector]
     public ScriptableCard[] deck;
     public List<CardHandler> deckLeft = new List<CardHandler>();
@@ -50,11 +48,25 @@ public class PlayerHandler : MonoBehaviour {
         else
             singletonPlayer = this;
 
-        deck = new ScriptableCard[deckScriptable.deck.Length];
-        for (int i = 0; i < deckScriptable.deck.Length; i++)
+        if (!isEnemy)
         {
-            deck[i] = deckScriptable.deck[i];
+            deck = new ScriptableCard[DeckSelector.singleton.selectedDeck.deck.Length];
+            for (int i = 0; i < DeckSelector.singleton.selectedDeck.deck.Length; i++)
+            {
+                deck[i] = DeckSelector.singleton.selectedDeck.deck[i];
+            }
         }
+        else
+        {
+            ScriptableDeck[] _decks = Resources.LoadAll<ScriptableDeck>("OpDecks");
+            int idDeck = Random.Range(0, _decks.Length);
+            deck = new ScriptableCard[_decks[idDeck].deck.Length];
+            for (int i = 0; i < deck.Length; i++)
+            {
+                deck[i] = _decks[idDeck].deck[i];
+            }
+        }
+        
     }
 
 	// Use this for initialization
