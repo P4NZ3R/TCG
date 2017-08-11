@@ -10,7 +10,7 @@ public class ScriptableEffect : ScriptableObject {
         Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp,DrawOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf
     }
     public Effects effect;
-    public int value;
+    public int value=1;
     public ScriptableCard linkedCard;
 
     //
@@ -68,19 +68,25 @@ public class ScriptableEffect : ScriptableObject {
     //
     void Draw(CardHandler card,int value)
     {
-        if(card.playerOwner)
-            GameManager.singleton.Draw(GameManager.Phase.Draw);
-        else
-            GameManager.singleton.OpDraw(GameManager.Phase.OpDraw);
+        for (int i = 0; i < value; i++)
+        {
+            if(card.playerOwner)
+                GameManager.singleton.Draw(GameManager.Phase.Draw);
+            else
+                GameManager.singleton.OpDraw(GameManager.Phase.OpDraw);
+        }
 
     }
 
     void DrawOp(CardHandler card,int value)
     {
-        if(card.playerOwner)
-            GameManager.singleton.OpDraw(GameManager.Phase.Draw);
-        else
-            GameManager.singleton.Draw(GameManager.Phase.OpDraw);
+        for (int i = 0; i < value; i++)
+        {
+            if(card.playerOwner)
+                GameManager.singleton.OpDraw(GameManager.Phase.Draw);
+            else
+                GameManager.singleton.Draw(GameManager.Phase.OpDraw);
+        }
 
     }
 
@@ -133,38 +139,50 @@ public class ScriptableEffect : ScriptableObject {
 
     void Summon(CardHandler card)
     {
-        CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
-        linkedCardHandler.SetCard(linkedCard,card.playerOwner,false,false);
-        if (card.playerOwner)
-            PlayerHandler.singletonPlayer.SummonCreature(linkedCardHandler);
-        else
-            PlayerHandler.singletonOpponent.SummonCreature(linkedCardHandler);
+        for (int i = 0; i < value; i++)
+        {
+            CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
+            linkedCardHandler.SetCard(linkedCard,card.playerOwner,false,false);
+            if (card.playerOwner)
+                PlayerHandler.singletonPlayer.SummonCreature(linkedCardHandler);
+            else
+                PlayerHandler.singletonOpponent.SummonCreature(linkedCardHandler);
+        }
     }
 
     void SummonOp(CardHandler card)
     {
-        CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
-        linkedCardHandler.SetCard(linkedCard,!card.playerOwner,false,false);
-        if (card.playerOwner)
-            PlayerHandler.singletonOpponent.SummonCreature(linkedCardHandler);
-        else
-            PlayerHandler.singletonPlayer.SummonCreature(linkedCardHandler);
+        for (int i = 0; i < value; i++)
+        {
+            CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
+            linkedCardHandler.SetCard(linkedCard,!card.playerOwner,false,false);
+            if (card.playerOwner)
+                PlayerHandler.singletonOpponent.SummonCreature(linkedCardHandler);
+            else
+                PlayerHandler.singletonPlayer.SummonCreature(linkedCardHandler);
+        }
     }
 
     void AddCreatureOnDeck(CardHandler card)
     {
-        if (card.playerOwner)
-            PlayerHandler.singletonPlayer.AddCardInDeck(linkedCard);
-        else
-            PlayerHandler.singletonOpponent.AddCardInDeck(linkedCard);
+        for (int i = 0; i < value; i++)
+        {
+            if (card.playerOwner)
+                PlayerHandler.singletonPlayer.AddCardInDeck(linkedCard);
+            else
+                PlayerHandler.singletonOpponent.AddCardInDeck(linkedCard);
+        }
     }
 
     void AddCreatureOnDeckOp(CardHandler card)
     {
-        if (card.playerOwner)
-            PlayerHandler.singletonOpponent.AddCardInDeck(linkedCard);
-        else
-            PlayerHandler.singletonPlayer.AddCardInDeck(linkedCard);
+        for (int i = 0; i < value; i++)
+        {
+            if (card.playerOwner)
+                PlayerHandler.singletonOpponent.AddCardInDeck(linkedCard);
+            else
+                PlayerHandler.singletonPlayer.AddCardInDeck(linkedCard);
+        }
     }
 
     void DestroySelf(CardHandler card)

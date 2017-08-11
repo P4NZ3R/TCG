@@ -31,6 +31,9 @@ public class PlayerHandler : MonoBehaviour {
                 LoseGame();
         }
     }
+    [SerializeField]
+    ScriptableDeck deckScriptable;
+    [HideInInspector]
     public ScriptableCard[] deck;
     public List<CardHandler> deckLeft = new List<CardHandler>();
     public List<CardHandler> hand = new List<CardHandler>();
@@ -43,6 +46,12 @@ public class PlayerHandler : MonoBehaviour {
             singletonOpponent = this;
         else
             singletonPlayer = this;
+
+        deck = new ScriptableCard[deckScriptable.deck.Length];
+        for (int i = 0; i < deckScriptable.deck.Length; i++)
+        {
+            deck[i] = deckScriptable.deck[i];
+        }
     }
 
 	// Use this for initialization

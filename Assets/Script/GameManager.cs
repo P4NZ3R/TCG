@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour {
     public Phase currentPhase;
     [HideInInspector]
     public bool gameEnded;
+    public int turn=1;
     //functions
     void Awake()
     {
@@ -41,9 +42,10 @@ public class GameManager : MonoBehaviour {
 
     void Start()
     {
-        currentPhase = Phase.Main;
+        currentPhase = Phase.Upkeep;
         InitGame();
-        PlayerHandler.singletonPlayer.canSummon = true;
+        events[0](Phase.Upkeep, null);
+        RequestNextPhase();
     }
 
     void NextPhase()
@@ -51,7 +53,10 @@ public class GameManager : MonoBehaviour {
         if (gameEnded)
             return;
         if (currentPhase == Phase.OpEndPhase)
+        {
             currentPhase = 0;
+            turn++;
+        }
         else
             currentPhase = (Phase)((int)currentPhase + 1);
 
@@ -108,7 +113,7 @@ public class GameManager : MonoBehaviour {
             PlayerHandler.singletonOpponent.AddCardInDeck(card);
         }
         //both draw cards
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 4; i++)
         {
             events[8](Phase.Draw);//Draw
             events[9](Phase.OpDraw);//OpDraw
@@ -164,7 +169,7 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            Debug.LogWarning("empty deck");
+            Debug.Log("empty deck");
         }
     }
 
@@ -178,7 +183,7 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            Debug.LogWarning("Opponent empty deck");
+            Debug.Log("Opponent empty deck");
         }
     }
 
@@ -214,6 +219,9 @@ public class GameManager : MonoBehaviour {
 
     void ResolveBattle(bool RampageBattle=false)
     {
+        if (turn == 1 && currentPhase == Phase.Battle)
+            return;
+
         CardHandler creature = PlayerHandler.singletonPlayer.creatures.Count > 0 ? PlayerHandler.singletonPlayer.creatures[0] : null;
         CardHandler opCreature = PlayerHandler.singletonOpponent.creatures.Count > 0 ? PlayerHandler.singletonOpponent.creatures[0] : null;
         
