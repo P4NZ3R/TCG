@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHandler : MonoBehaviour {
     public static PlayerHandler singletonPlayer;
@@ -82,6 +83,8 @@ public class PlayerHandler : MonoBehaviour {
         {
             BotPlayCard();
         }
+        if (Input.GetKeyDown(KeyCode.Escape))
+            BackToMenu();
 	}
 
     void BotPlayCard()
@@ -189,10 +192,15 @@ public class PlayerHandler : MonoBehaviour {
 
     void LoseGame()
     {
-        Debug.LogError(gameObject.name+" lose the game");
+        Debug.LogWarning(gameObject.name+" lose the game");
         GameManager.singleton.gameEnded = true;
+        Invoke("BackToMenu", 5f);
     }
 
+    void BackToMenu()
+    {
+        SceneManager.LoadScene("deckSelect");
+    }
 
     public void SummonCreature(CardHandler card)
     {
