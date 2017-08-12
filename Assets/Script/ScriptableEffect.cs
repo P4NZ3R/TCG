@@ -5,13 +5,19 @@ using UnityEngine;
 [CreateAssetMenu]
 public class ScriptableEffect : ScriptableObject {
 
+    public enum Type
+    {
+        Battlefield,Hand,Deck
+    }
     public enum Effects
     {
         Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp,DrawOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf,RevealCardInHand,AddCreatureInHand,AddCreatureInHandOp
     }
     public Effects effect;
+    public Type type;
     public int value=1;
     public ScriptableCard linkedCard;
+
 
     //
     public void Activate(CardHandler card)

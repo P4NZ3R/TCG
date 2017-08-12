@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour {
     //events
     public GenericEvent[] events = new GenericEvent[16];
     //enum
-    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,Discard,OpDiscard,SelfSummon,SelfDeath,SelfDiscard,Null,UpkeepDeck,UpkeepHand}
+    public enum Phase{Upkeep,Main,Battle,EndPhase,OpUpkeep,OpMain,OpBattle,OpEndPhase,Draw,OpDraw,SummonPerm,OpSummonPerm,DestroyPerm,OpDestroyPerm,Discard,OpDiscard,SelfSummon,SelfDeath,SelfDiscard,Null}
     //setter
 
     //variables
