@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class CardHandler : MonoBehaviour,IPointerEnterHandler {
     public bool playerOwner;
+    ScriptableCard.Type position;
     [SerializeField]
     Text cardName;
     [SerializeField]
@@ -20,7 +21,8 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
     [HideInInspector]
     public int currentPower;
 
-    public void SetCard (ScriptableCard card,bool playerOwner=true,bool isBot=false,bool interactable=true) {
+    public void SetCard (ScriptableCard card,ScriptableCard.Type pos,bool playerOwner=true,bool isBot=false,bool interactable=true) {
+        position = pos;
         this.playerOwner = playerOwner;
         cardName.text = card.nome;
         img.sprite = card.image;
@@ -82,7 +84,7 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
             phase = PlayerHandler.singletonOpponent.ConvertPhaseOpponentPlayer((int)currPhase);
         foreach (ScriptableCard.Effect _effect in ScriptCard.effects)
         {
-            if (phase == (int)_effect.phase)
+            if (phase == (int)_effect.phase && position == _effect.type)
                 EffectManager.singleton.Activate(this,_effect);
         }
     }

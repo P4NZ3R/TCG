@@ -27,7 +27,9 @@ public class GameManager : MonoBehaviour {
     public Phase currentPhase;
     [HideInInspector]
     public bool gameEnded;
+    [HideInInspector]
     public int turn=1;
+    public bool debugMode;
     //functions
     void Awake()
     {
@@ -121,9 +123,9 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator WaitForNextPhase()
     {
-        yield return new WaitForSeconds(PlayerHandler.singletonPlayer.speedUp ? 0.1f : 1f);
+        yield return new WaitForSeconds(PlayerHandler.singletonPlayer.speedUp ? 0.4f : 1f);
         if(currentPhase==Phase.Main || currentPhase==Phase.OpMain)
-            yield return new WaitForSeconds(PlayerHandler.singletonPlayer.speedUp ? 0.2f : 2f);
+            yield return new WaitForSeconds(PlayerHandler.singletonPlayer.speedUp ? 0.8f : 2f);
         NextPhase();
     }
 
@@ -152,42 +154,42 @@ public class GameManager : MonoBehaviour {
 
     void Upkeep(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("UpKeep!");
+        Debug.Log(turn+" UpKeep!");
         if (turn > 15)
             PlayerHandler.singletonPlayer.HealthLeft -= turn - 15;
         events[8](Phase.Draw);//Draw
     }
     void Main1(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("Main!");
+        Debug.Log(turn+" Main!");
     }
     void Battle(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("Battle!");
+        Debug.Log(turn+" Battle!");
     }
     void EndPhase(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("EndPhase!");
+        Debug.Log(turn+" EndPhase!");
     }
 
     void OpUpkeep(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("OpUpkeep!");
+        Debug.Log(turn+" OpUpkeep!");
         if(turn>15)
             PlayerHandler.singletonOpponent.HealthLeft -= turn - 15;
         events[9](Phase.Draw);//OpDraw
     }
     void OpMain1(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("OpMain!");
+        Debug.Log(turn+" OpMain!");
     }
     void OpBattle(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("Opbattle!");
+        Debug.Log(turn+" Opbattle!");
     }
     void OpEndPhase(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("OpEndPhase!");
+        Debug.Log(turn+" OpEndPhase!");
     }
 
     //functions
@@ -221,32 +223,32 @@ public class GameManager : MonoBehaviour {
 
     void SummonPerm(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("summoned Perm");
+        Debug.Log(turn+" summoned Perm");
     }
 
     void OpSummonPerm(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("OpSummonPer");
+        Debug.Log(turn+" OpSummonPer");
     }
 
     void DestroyPerm(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("Destroyed perm");
+        Debug.Log(turn+" Destroyed perm");
     }
 
     void OpDestroyPerm(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("OpDestroyed perm");
+        Debug.Log(turn+" OpDestroyed perm");
     }
 
     void Discard(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("Discard");
+        Debug.Log(turn+" Discard");
     }
 
     void OpDiscard(Phase currPhase,CardHandler card=null)
     {
-        Debug.Log("OpDiscard");
+        Debug.Log(turn+" OpDiscard");
     }
 
     void ResolveBattle(bool RampageBattle=false)

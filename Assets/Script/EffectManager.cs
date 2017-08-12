@@ -47,6 +47,9 @@ public class EffectManager : MonoBehaviour {
             case ScriptableCard.EffectsType.Discard:
                 Discard(card);
                 break;
+            case ScriptableCard.EffectsType.DiscardOp:
+                DiscardOp(card);
+                break;
             case ScriptableCard.EffectsType.Summon:
                 Summon(card);
                 break;
@@ -75,6 +78,8 @@ public class EffectManager : MonoBehaviour {
                 Debug.LogError("no effect founded");
                 break;
         }
+        if (GameManager.singleton.debugMode)
+            Debug.Log((card.playerOwner?"PG ":"OP ")+card.ScriptCard.name+"->"+_effect.effectType.ToString() + ": value="+value +" linkedCard:"+linkedCard);
     }
     //
     void Draw(CardHandler card,int value)
@@ -148,12 +153,23 @@ public class EffectManager : MonoBehaviour {
         }
     }
 
+    void DiscardOp(CardHandler card)
+    {
+        for (int i = 0; i < value; i++)
+        {
+            if (card.playerOwner)
+                PlayerHandler.singletonOpponent.DiscardCardinHand();
+            else
+                PlayerHandler.singletonPlayer.DiscardCardinHand();
+        }
+    }
+
     void Summon(CardHandler card)
     {
         for (int i = 0; i < value; i++)
         {
             CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
-            linkedCardHandler.SetCard(linkedCard,card.playerOwner,false,false);
+            linkedCardHandler.SetCard(linkedCard,ScriptableCard.Type.Battlefield ,card.playerOwner,false,false);
             if (card.playerOwner)
                 PlayerHandler.singletonPlayer.SummonCreature(linkedCardHandler);
             else
@@ -166,7 +182,7 @@ public class EffectManager : MonoBehaviour {
         for (int i = 0; i < value; i++)
         {
             CardHandler linkedCardHandler = Instantiate(PlayerHandler.singletonPlayer.prefabCard).GetComponent<CardHandler>();
-            linkedCardHandler.SetCard(linkedCard,!card.playerOwner,false,false);
+            linkedCardHandler.SetCard(linkedCard,ScriptableCard.Type.Battlefield,!card.playerOwner,false,false);
             if (card.playerOwner)
                 PlayerHandler.singletonOpponent.SummonCreature(linkedCardHandler);
             else
@@ -218,12 +234,12 @@ public class EffectManager : MonoBehaviour {
         {
             if (card.playerOwner)
             {
-                cardHandler.SetCard(linkedCard,!PlayerHandler.singletonPlayer.isEnemy,PlayerHandler.singletonPlayer.isBot,!PlayerHandler.singletonPlayer.isBot);
+                cardHandler.SetCard(linkedCard,ScriptableCard.Type.Hand,!PlayerHandler.singletonPlayer.isEnemy,PlayerHandler.singletonPlayer.isBot,!PlayerHandler.singletonPlayer.isBot);
                 PlayerHandler.singletonPlayer.AddCardInHand(cardHandler);
             }
             else
             {
-                cardHandler.SetCard(linkedCard,!PlayerHandler.singletonOpponent.isEnemy,PlayerHandler.singletonOpponent.isBot,!PlayerHandler.singletonOpponent.isBot);
+                cardHandler.SetCard(linkedCard,ScriptableCard.Type.Hand,!PlayerHandler.singletonOpponent.isEnemy,PlayerHandler.singletonOpponent.isBot,!PlayerHandler.singletonOpponent.isBot);
                 PlayerHandler.singletonOpponent.AddCardInHand(cardHandler);
             }
         }
@@ -238,12 +254,12 @@ public class EffectManager : MonoBehaviour {
         {
             if (card.playerOwner)
             {
-                cardHandler.SetCard(linkedCard,!PlayerHandler.singletonOpponent.isEnemy,PlayerHandler.singletonOpponent.isBot,!PlayerHandler.singletonOpponent.isBot);
+                cardHandler.SetCard(linkedCard,ScriptableCard.Type.Hand,!PlayerHandler.singletonOpponent.isEnemy,PlayerHandler.singletonOpponent.isBot,!PlayerHandler.singletonOpponent.isBot);
                 PlayerHandler.singletonOpponent.AddCardInHand(cardHandler);
             }
             else
             {
-                cardHandler.SetCard(linkedCard, !PlayerHandler.singletonPlayer.isEnemy, PlayerHandler.singletonPlayer.isBot, !PlayerHandler.singletonPlayer.isBot);
+                cardHandler.SetCard(linkedCard,ScriptableCard.Type.Hand,!PlayerHandler.singletonPlayer.isEnemy, PlayerHandler.singletonPlayer.isBot, !PlayerHandler.singletonPlayer.isBot);
                 PlayerHandler.singletonPlayer.AddCardInHand(cardHandler);
             }
         }
