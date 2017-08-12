@@ -116,7 +116,7 @@ public class PlayerHandler : MonoBehaviour {
         cardHandler.SetCard(card,!isEnemy,isBot,!isBot);
         deckLeft.Insert(Random.Range(0,deckLeft.Count-1),cardHandler);
 
-        AddEffectOnDelegates(cardHandler, ScriptableEffect.Type.Deck);
+        AddEffectOnDelegates(cardHandler, ScriptableCard.Type.Deck);
 
         deckCounter.text = deckLeft.Count.ToString();
         deckCounter.color = deckLeft.Count > 0 ? Color.black : Color.red;
@@ -126,7 +126,7 @@ public class PlayerHandler : MonoBehaviour {
     {
         deckLeft.Remove(card);
 
-        RemoveEffectOnDelegates(card, ScriptableEffect.Type.Deck);
+        RemoveEffectOnDelegates(card, ScriptableCard.Type.Deck);
 
         deckCounter.text = deckLeft.Count.ToString();
         deckCounter.color = deckLeft.Count > 0 ? Color.black : Color.red;
@@ -138,10 +138,10 @@ public class PlayerHandler : MonoBehaviour {
             return;
 
         CardHandler card = hand[0];
-        ScriptableEffect _effect = UtilityFunctions.SearchEffectPhase(card.ScriptCard, GameManager.Phase.SelfDiscard);
+        ScriptableCard.Effect _effect = UtilityFunctions.SearchEffectPhase(card.ScriptCard, GameManager.Phase.SelfDiscard);
         if (_effect != null)
         {
-            _effect.Activate(card);
+            EffectManager.singleton.Activate(card,_effect);
         }
             
         RemoveCardFromHand(card);
@@ -160,7 +160,7 @@ public class PlayerHandler : MonoBehaviour {
         card.transform.SetAsFirstSibling();
         hand.Add(card);
 
-        AddEffectOnDelegates(card, ScriptableEffect.Type.Hand);
+        AddEffectOnDelegates(card, ScriptableCard.Type.Hand);
     }
 
     public void RemoveCardFromHand(CardHandler card)
@@ -169,11 +169,11 @@ public class PlayerHandler : MonoBehaviour {
         card.SetCover(false);
         hand.Remove(card);
 
-        RemoveEffectOnDelegates(card, ScriptableEffect.Type.Hand);
+        RemoveEffectOnDelegates(card, ScriptableCard.Type.Hand);
 
     }
 
-    void AddEffectOnDelegates(CardHandler card,ScriptableEffect.Type _type)
+    void AddEffectOnDelegates(CardHandler card,ScriptableCard.Type _type)
     {
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
         {
@@ -184,19 +184,19 @@ public class PlayerHandler : MonoBehaviour {
                 phase=ConvertPhaseOpponentPlayer(phase);
             }
             //
-            if (phase <= 15 && _type==_effect.effect.type)
+            if (phase <= 15 && _type==_effect.type)
             {
                 GameManager.singleton.events[phase] -= card.ActivateEffect;//nel caso ci siano effetti multipli nella stessa fase evita che stackino assieme
                 GameManager.singleton.events[phase] += card.ActivateEffect;
             }
-            else if (_effect.phase == GameManager.Phase.SelfSummon && _type==ScriptableEffect.Type.Battlefield)
-                _effect.effect.Activate(card);
-            else if (_effect.effect.effect == ScriptableEffect.Effects.RevealCardInHand && _type==ScriptableEffect.Type.Hand)
-                _effect.effect.Activate(card);
+            else if (_effect.phase == GameManager.Phase.SelfSummon && _type==ScriptableCard.Type.Battlefield)
+                EffectManager.singleton.Activate(card,_effect);
+            else if (_effect.effectType == ScriptableCard.EffectsType.RevealCardInHand && _type==ScriptableCard.Type.Hand)
+                EffectManager.singleton.Activate(card,_effect);
         }
     }
 
-    void RemoveEffectOnDelegates(CardHandler card,ScriptableEffect.Type _type)
+    void RemoveEffectOnDelegates(CardHandler card,ScriptableCard.Type _type)
     {
         foreach (ScriptableCard.Effect _effect in card.ScriptCard.effects)
         {
@@ -207,12 +207,12 @@ public class PlayerHandler : MonoBehaviour {
                 phase=ConvertPhaseOpponentPlayer(phase);
             }
             //
-            if (phase <= 15 && _type==_effect.effect.type)
+            if (phase <= 15 && _type==_effect.type)
             {
                 GameManager.singleton.events[phase] -= card.ActivateEffect;
             }
-            else if (_effect.phase == GameManager.Phase.SelfDeath && _type==ScriptableEffect.Type.Battlefield)
-                _effect.effect.Activate(card);
+            else if (_effect.phase == GameManager.Phase.SelfDeath && _type==ScriptableCard.Type.Battlefield)
+                EffectManager.singleton.Activate(card,_effect);
         }
     }
 
@@ -234,7 +234,7 @@ public class PlayerHandler : MonoBehaviour {
         card.transform.SetParent(creaturesLayout.transform);
         card.transform.SetAsFirstSibling();
 
-        AddEffectOnDelegates(card, ScriptableEffect.Type.Battlefield);
+        AddEffectOnDelegates(card, ScriptableCard.Type.Battlefield);
 
         if(isEnemy)
             GameManager.singleton.events[11](GameManager.Phase.OpSummonPerm);//OpSummonPerm
@@ -252,7 +252,7 @@ public class PlayerHandler : MonoBehaviour {
         }
             
         creatures.Remove(card);
-        RemoveEffectOnDelegates(card, ScriptableEffect.Type.Battlefield);
+        RemoveEffectOnDelegates(card, ScriptableCard.Type.Battlefield);
 
 //        
         Destroy(card.gameObject);

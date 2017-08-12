@@ -2,77 +2,73 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu]
-public class ScriptableEffect : ScriptableObject {
+public class EffectManager : MonoBehaviour {
+    public static EffectManager singleton;
 
-    public enum Type
-    {
-        Battlefield,Hand,Deck
-    }
-    public enum Effects
-    {
-        Draw,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,Summon,SummonOp,DrawOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf,RevealCardInHand,AddCreatureInHand,AddCreatureInHandOp
-    }
-    public Effects effect;
-    public Type type;
-    public int value=1;
-    public ScriptableCard linkedCard;
-
+    int value=1;
+    ScriptableCard linkedCard;
 
     //
-    public void Activate(CardHandler card)
+    public void Awake()
     {
-        switch (effect)
+        singleton = this;
+    }
+
+    public void Activate(CardHandler card,ScriptableCard.Effect _effect)
+    {
+        this.value = _effect.value;
+        this.linkedCard = _effect.linkedCard;
+        switch (_effect.effectType)
         {
-            case Effects.Draw:
+            case ScriptableCard.EffectsType.Draw:
                 Draw(card,value);
                 break;
-            case Effects.DrawOp:
+            case ScriptableCard.EffectsType.DrawOp:
                 DrawOp(card,value);
                 break;
-            case Effects.ChangePower:
+            case ScriptableCard.EffectsType.ChangePower:
                 ChangePower(card,value);
                 break;
-            case Effects.Charge:
+            case ScriptableCard.EffectsType.Charge:
                 Charge(card);
                 break;
-            case Effects.Trample:
-                Debug.LogError(effect.ToString() + " is a passive effect");
+            case ScriptableCard.EffectsType.Trample:
+                Debug.LogError(_effect.effectType.ToString() + " is a passive effect");
                 break;
-            case Effects.Rampage:
-                Debug.LogError(effect.ToString() + " is a passive effect");
+            case ScriptableCard.EffectsType.Rampage:
+                Debug.LogError(_effect.effectType.ToString() + " is a passive effect");
                 break;
-            case Effects.ChangeHealth:
+            case ScriptableCard.EffectsType.ChangeHealth:
                 ChangeHealth(card,value);
                 break;
-            case Effects.ChangeHealthOp:
+            case ScriptableCard.EffectsType.ChangeHealthOp:
                 ChangeHealthOp(card,value);
                 break;
-            case Effects.Discard:
+            case ScriptableCard.EffectsType.Discard:
                 Discard(card);
                 break;
-            case Effects.Summon:
+            case ScriptableCard.EffectsType.Summon:
                 Summon(card);
                 break;
-            case Effects.SummonOp:
+            case ScriptableCard.EffectsType.SummonOp:
                 SummonOp(card);
                 break;
-            case Effects.AddCreatureInDeck:
+            case ScriptableCard.EffectsType.AddCreatureInDeck:
                 AddCreatureInDeck(card);
                 break;
-            case Effects.AddCreatureInDeckOp:
+            case ScriptableCard.EffectsType.AddCreatureInDeckOp:
                 AddCreatureInDeckOp(card);
                 break;
-            case Effects.DestroySelf:
+            case ScriptableCard.EffectsType.DestroySelf:
                 DestroySelf(card);
                 break;
-            case Effects.RevealCardInHand:
+            case ScriptableCard.EffectsType.RevealCardInHand:
                 RevealInHand(card);
                 break;
-            case Effects.AddCreatureInHand:
+            case ScriptableCard.EffectsType.AddCreatureInHand:
                 AddCreatureInHand(card);
                 break;
-            case Effects.AddCreatureInHandOp:
+            case ScriptableCard.EffectsType.AddCreatureInHandOp:
                 AddCreatureInHandOp(card);
                 break;
             default:

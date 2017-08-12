@@ -3,10 +3,13 @@
 [CreateAssetMenu]
 public class ScriptableCard : ScriptableObject
 {
+    public enum EffectsType
+    {
+        Draw,DrawOp,ChangePower,Charge,Trample,Rampage,ChangeHealth,ChangeHealthOp,Discard,DiscardOp,Summon,SummonOp,AddCreatureInHand,AddCreatureInHandOp,AddCreatureInDeck,AddCreatureInDeckOp,DestroySelf,RevealCardInHand
+    }
     public bool isCollectable=true;
     public string nome;
     public Sprite image;
-    public Type type;
     public Elements cost1;
     public Elements cost2;
     public Elements cost3;
@@ -22,7 +25,7 @@ public class ScriptableCard : ScriptableObject
 
     public enum Type
     {
-        Creature,Spell,Constant
+        Battlefield,Hand,Deck
     }
 
     //
@@ -32,6 +35,9 @@ public class ScriptableCard : ScriptableObject
     public class Effect
     {
         public GameManager.Phase phase;
-        public ScriptableEffect effect;
+        public EffectsType effectType;
+        public Type type;
+        public int value;
+        public ScriptableCard linkedCard;
     }
 }

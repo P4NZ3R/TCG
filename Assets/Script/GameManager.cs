@@ -266,12 +266,12 @@ public class GameManager : MonoBehaviour {
                     //controllo se ha trample o Rampage
                     foreach (ScriptableCard.Effect _effect in creature.ScriptCard.effects)
                     {
-                        if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
+                        if (_effect.effectType == ScriptableCard.EffectsType.Trample)
                         {
                             PlayerHandler.singletonOpponent.HealthLeft -= creaturePower - opCreaturePower;
                             break;
                         }
-                        if (_effect.effect.effect == ScriptableEffect.Effects.Rampage && !RampageBattle)
+                        if (_effect.effectType == ScriptableCard.EffectsType.Rampage && !RampageBattle)
                         {
                             ResolveBattle(true);
                             break;
@@ -288,12 +288,12 @@ public class GameManager : MonoBehaviour {
                     //controllo se ha trample o Rampage
                     foreach (ScriptableCard.Effect _effect in opCreature.ScriptCard.effects)
                     {
-                        if (_effect.effect.effect == ScriptableEffect.Effects.Trample)
+                        if (_effect.effectType == ScriptableCard.EffectsType.Trample)
                         {
                             PlayerHandler.singletonPlayer.HealthLeft -= opCreaturePower - creaturePower;
                             break;
                         }
-                        if (_effect.effect.effect == ScriptableEffect.Effects.Rampage && !RampageBattle)
+                        if (_effect.effectType == ScriptableCard.EffectsType.Rampage && !RampageBattle)
                         {
                             ResolveBattle(true);
                             break;
