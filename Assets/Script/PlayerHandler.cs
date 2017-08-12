@@ -10,6 +10,7 @@ public class PlayerHandler : MonoBehaviour {
     //
     public bool isEnemy;
     public bool isBot;
+    public bool speedUp;
     public GameObject prefabCard;
     [SerializeField]
     GameObject handLayout;
@@ -59,7 +60,7 @@ public class PlayerHandler : MonoBehaviour {
         }
         else
         {
-            ScriptableDeck[] _decks = Resources.LoadAll<ScriptableDeck>("OpDecks");
+            ScriptableDeck[] _decks = Resources.LoadAll<ScriptableDeck>("Decks Op");
             int idDeck = Random.Range(0, _decks.Length);
             deck = new ScriptableCard[_decks[idDeck].deck.Length];
             for (int i = 0; i < deck.Length; i++)
@@ -86,6 +87,16 @@ public class PlayerHandler : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape))
             BackToMenu();
 	}
+
+    public void BotActive()
+    {
+        isBot = !isBot;
+    }
+
+    public void SpeedUp()
+    {
+        speedUp = !speedUp;
+    }
 
     void BotPlayCard()
     {

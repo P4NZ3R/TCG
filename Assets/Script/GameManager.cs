@@ -121,9 +121,9 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator WaitForNextPhase()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(PlayerHandler.singletonPlayer.speedUp ? 0.1f : 1f);
         if(currentPhase==Phase.Main || currentPhase==Phase.OpMain)
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(PlayerHandler.singletonPlayer.speedUp ? 0.2f : 2f);
         NextPhase();
     }
 
