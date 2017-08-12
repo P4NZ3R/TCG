@@ -153,6 +153,8 @@ public class GameManager : MonoBehaviour {
     void Upkeep(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("UpKeep!");
+        if (turn > 15)
+            PlayerHandler.singletonPlayer.HealthLeft -= turn - 15;
         events[8](Phase.Draw);//Draw
     }
     void Main1(Phase currPhase,CardHandler card=null)
@@ -171,6 +173,8 @@ public class GameManager : MonoBehaviour {
     void OpUpkeep(Phase currPhase,CardHandler card=null)
     {
         Debug.Log("OpUpkeep!");
+        if(turn>15)
+            PlayerHandler.singletonOpponent.HealthLeft -= turn - 15;
         events[9](Phase.Draw);//OpDraw
     }
     void OpMain1(Phase currPhase,CardHandler card=null)
