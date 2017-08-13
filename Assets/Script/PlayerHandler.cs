@@ -29,8 +29,10 @@ public class PlayerHandler : MonoBehaviour {
         }
         set
         {
-            if(value<=GameManager.singleton.healthMax)
-            healthLeft = value; 
+            if (value <= GameManager.singleton.healthMax)
+                healthLeft = value;
+            else
+                healthLeft = GameManager.singleton.healthMax;
             healthText.text = healthLeft.ToString();
             healthText.color = healthLeft >= 10 ? Color.black : healthLeft >= 1 ? Color.yellow : Color.red;
             if (healthLeft <= 0)
