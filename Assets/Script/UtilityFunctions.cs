@@ -4,16 +4,21 @@ using UnityEngine;
 
 public static class UtilityFunctions {
 
-    public static ScriptableCard[] ShuffleDeck(ScriptableCard[] deck,int cardsLeft)
+    public static List<CardHandler> ShuffleDeck(CardHandler[] deck)
     {
-        for (int i = cardsLeft - 1; i > 0; i--) 
+        for (int i = deck.Length - 1; i > 0; i--) 
         {
             int r = Random.Range(0,i);
-            ScriptableCard tmp = deck[i];
+            CardHandler tmp = deck[i];
             deck[i] = deck[r];
             deck[r] = tmp;
         }
-        return deck;
+        List<CardHandler> deckToList = new List<CardHandler>();
+        for (int j = 0; j < deck.Length; j++)
+        {
+            deckToList.Add(deck[j]);
+        }
+        return deckToList;
     }  
 
     public static ScriptableCard.Effect SearchEffectPhase(ScriptableCard card,GameManager.Phase phase)

@@ -21,7 +21,7 @@ public class PlayerHandler : MonoBehaviour {
     [SerializeField]
     Text deckCounter;
     //
-    int healthLeft=30;
+    int healthLeft;
     public int HealthLeft{
         get
         { 
@@ -29,9 +29,10 @@ public class PlayerHandler : MonoBehaviour {
         }
         set
         {
+            if(value<=GameManager.singleton.healthMax)
             healthLeft = value; 
             healthText.text = healthLeft.ToString();
-            healthText.color = healthLeft >= 20 ? Color.black : healthLeft >= 10 ? Color.yellow : Color.red;
+            healthText.color = healthLeft >= 10 ? Color.black : healthLeft >= 1 ? Color.yellow : Color.red;
             if (healthLeft <= 0)
                 LoseGame();
         }
@@ -71,9 +72,9 @@ public class PlayerHandler : MonoBehaviour {
         
     }
 
-	// Use this for initialization
-	void Start () {
-        HealthLeft = 20;
+    // Use this for initialization
+    void Start () {
+        HealthLeft = GameManager.singleton.healthInit;
         if (isBot && !isEnemy && canSummon)
             BotPlayCard();
 	}
@@ -114,7 +115,8 @@ public class PlayerHandler : MonoBehaviour {
         go.transform.SetParent(transform);
         CardHandler cardHandler = go.GetComponent<CardHandler>();
         cardHandler.SetCard(card,ScriptableCard.Type.Deck,!isEnemy,isBot,!isBot);
-        deckLeft.Insert(Random.Range(0,deckLeft.Count-1),cardHandler);
+        deckLeft.Add(cardHandler);
+        deckLeft = UtilityFunctions.ShuffleDeck(deckLeft.ToArray());
 
         AddEffectOnDelegates(cardHandler, ScriptableCard.Type.Deck);
 

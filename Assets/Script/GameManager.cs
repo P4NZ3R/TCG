@@ -30,6 +30,11 @@ public class GameManager : MonoBehaviour {
     [HideInInspector]
     public int turn=1;
     public bool debugMode;
+    
+    [HideInInspector]
+    public int healthMax=30;
+    [HideInInspector]
+    public int healthInit=20;
     //functions
     void Awake()
     {
@@ -155,8 +160,6 @@ public class GameManager : MonoBehaviour {
     void Upkeep(Phase currPhase,CardHandler card=null)
     {
         Debug.Log(turn+" UpKeep!");
-        if (turn > 15)
-            PlayerHandler.singletonPlayer.HealthLeft -= turn - 15;
         events[8](Phase.Draw);//Draw
     }
     void Main1(Phase currPhase,CardHandler card=null)
@@ -175,8 +178,6 @@ public class GameManager : MonoBehaviour {
     void OpUpkeep(Phase currPhase,CardHandler card=null)
     {
         Debug.Log(turn+" OpUpkeep!");
-        if(turn>15)
-            PlayerHandler.singletonOpponent.HealthLeft -= turn - 15;
         events[9](Phase.Draw);//OpDraw
     }
     void OpMain1(Phase currPhase,CardHandler card=null)
@@ -204,6 +205,7 @@ public class GameManager : MonoBehaviour {
         else
         {
             Debug.Log("empty deck");
+            PlayerHandler.singletonPlayer.HealthLeft -= 3;
         }
     }
 
@@ -218,6 +220,7 @@ public class GameManager : MonoBehaviour {
         else
         {
             Debug.Log("Opponent empty deck");
+            PlayerHandler.singletonOpponent.HealthLeft -= 3;
         }
     }
 
