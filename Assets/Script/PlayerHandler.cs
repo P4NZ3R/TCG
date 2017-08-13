@@ -73,7 +73,7 @@ public class PlayerHandler : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        HealthLeft = 30;
+        HealthLeft = 20;
         if (isBot && !isEnemy && canSummon)
             BotPlayCard();
 	}
@@ -158,6 +158,7 @@ public class PlayerHandler : MonoBehaviour {
     {
         card.transform.SetParent(handLayout.transform);
         card.transform.SetAsFirstSibling();
+        card.SetPosition(ScriptableCard.Type.Hand);
         hand.Add(card);
 
         AddEffectOnDelegates(card, ScriptableCard.Type.Hand);
@@ -233,6 +234,7 @@ public class PlayerHandler : MonoBehaviour {
         creatures.Add(card);
         card.transform.SetParent(creaturesLayout.transform);
         card.transform.SetAsFirstSibling();
+        card.SetPosition(ScriptableCard.Type.Battlefield);
 
         AddEffectOnDelegates(card, ScriptableCard.Type.Battlefield);
 

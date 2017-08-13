@@ -5,9 +5,6 @@ using UnityEngine;
 public class EffectManager : MonoBehaviour {
     public static EffectManager singleton;
 
-    int value=1;
-    ScriptableCard linkedCard;
-
     //
     public void Awake()
     {
@@ -16,18 +13,16 @@ public class EffectManager : MonoBehaviour {
 
     public void Activate(CardHandler card,ScriptableCard.Effect _effect)
     {
-        this.value = _effect.value;
-        this.linkedCard = _effect.linkedCard;
         switch (_effect.effectType)
         {
             case ScriptableCard.EffectsType.Draw:
-                Draw(card,value);
+                Draw(card,_effect.value);
                 break;
             case ScriptableCard.EffectsType.DrawOp:
-                DrawOp(card,value);
+                DrawOp(card,_effect.value);
                 break;
             case ScriptableCard.EffectsType.ChangePower:
-                ChangePower(card,value);
+                ChangePower(card,_effect.value);
                 break;
             case ScriptableCard.EffectsType.Charge:
                 Charge(card);
@@ -39,28 +34,28 @@ public class EffectManager : MonoBehaviour {
                 Debug.LogError(_effect.effectType.ToString() + " is a passive effect");
                 break;
             case ScriptableCard.EffectsType.ChangeHealth:
-                ChangeHealth(card,value);
+                ChangeHealth(card,_effect.value);
                 break;
             case ScriptableCard.EffectsType.ChangeHealthOp:
-                ChangeHealthOp(card,value);
+                ChangeHealthOp(card,_effect.value);
                 break;
             case ScriptableCard.EffectsType.Discard:
-                Discard(card);
+                Discard(card,_effect.value);
                 break;
             case ScriptableCard.EffectsType.DiscardOp:
-                DiscardOp(card);
+                DiscardOp(card,_effect.value);
                 break;
             case ScriptableCard.EffectsType.Summon:
-                Summon(card);
+                Summon(card,_effect.value,_effect.linkedCard);
                 break;
             case ScriptableCard.EffectsType.SummonOp:
-                SummonOp(card);
+                SummonOp(card,_effect.value,_effect.linkedCard);
                 break;
             case ScriptableCard.EffectsType.AddCreatureInDeck:
-                AddCreatureInDeck(card);
+                AddCreatureInDeck(card,_effect.value,_effect.linkedCard);
                 break;
             case ScriptableCard.EffectsType.AddCreatureInDeckOp:
-                AddCreatureInDeckOp(card);
+                AddCreatureInDeckOp(card,_effect.value,_effect.linkedCard);
                 break;
             case ScriptableCard.EffectsType.DestroySelf:
                 DestroySelf(card);
@@ -69,17 +64,17 @@ public class EffectManager : MonoBehaviour {
                 RevealInHand(card);
                 break;
             case ScriptableCard.EffectsType.AddCreatureInHand:
-                AddCreatureInHand(card);
+                AddCreatureInHand(card,_effect.value,_effect.linkedCard);
                 break;
             case ScriptableCard.EffectsType.AddCreatureInHandOp:
-                AddCreatureInHandOp(card);
+                AddCreatureInHandOp(card,_effect.value,_effect.linkedCard);
                 break;
             default:
                 Debug.LogError("no effect founded");
                 break;
         }
         if (GameManager.singleton.debugMode)
-            Debug.Log((card.playerOwner?"PG ":"OP ")+card.ScriptCard.name+"->"+_effect.effectType.ToString() + ": value="+value +" linkedCard:"+linkedCard);
+            Debug.Log((card.playerOwner?"PG ":"OP ")+card.ScriptCard.name+"->"+_effect.type.ToString()+" "+_effect.effectType.ToString() + ": value="+_effect.value +" linkedCard:"+_effect.linkedCard);
     }
     //
     void Draw(CardHandler card,int value)
@@ -142,7 +137,7 @@ public class EffectManager : MonoBehaviour {
             PlayerHandler.singletonPlayer.HealthLeft += value;
     }
 
-    void Discard(CardHandler card)
+    void Discard(CardHandler card,int value)
     {
         for (int i = 0; i < value; i++)
         {
@@ -153,7 +148,7 @@ public class EffectManager : MonoBehaviour {
         }
     }
 
-    void DiscardOp(CardHandler card)
+    void DiscardOp(CardHandler card,int value)
     {
         for (int i = 0; i < value; i++)
         {
@@ -164,7 +159,7 @@ public class EffectManager : MonoBehaviour {
         }
     }
 
-    void Summon(CardHandler card)
+    void Summon(CardHandler card,int value,ScriptableCard linkedCard)
     {
         for (int i = 0; i < value; i++)
         {
@@ -177,7 +172,7 @@ public class EffectManager : MonoBehaviour {
         }
     }
 
-    void SummonOp(CardHandler card)
+    void SummonOp(CardHandler card,int value,ScriptableCard linkedCard)
     {
         for (int i = 0; i < value; i++)
         {
@@ -190,7 +185,7 @@ public class EffectManager : MonoBehaviour {
         }
     }
 
-    void AddCreatureInDeck(CardHandler card)
+    void AddCreatureInDeck(CardHandler card,int value,ScriptableCard linkedCard)
     {
         for (int i = 0; i < value; i++)
         {
@@ -201,7 +196,7 @@ public class EffectManager : MonoBehaviour {
         }
     }
 
-    void AddCreatureInDeckOp(CardHandler card)
+    void AddCreatureInDeckOp(CardHandler card,int value,ScriptableCard linkedCard)
     {
         for (int i = 0; i < value; i++)
         {
@@ -225,7 +220,7 @@ public class EffectManager : MonoBehaviour {
         card.SetCover(false);
     }
 
-    void AddCreatureInHand(CardHandler card)
+    void AddCreatureInHand(CardHandler card,int value,ScriptableCard linkedCard)
     {
         GameObject go = Instantiate(PlayerHandler.singletonPlayer.prefabCard);
         go.name = "card: "+card.ScriptCard.nome;
@@ -245,7 +240,7 @@ public class EffectManager : MonoBehaviour {
         }
     }
 
-    void AddCreatureInHandOp(CardHandler card)
+    void AddCreatureInHandOp(CardHandler card,int value,ScriptableCard linkedCard)
     {
         GameObject go = Instantiate(PlayerHandler.singletonPlayer.prefabCard);
         go.name = "card: "+card.ScriptCard.nome;

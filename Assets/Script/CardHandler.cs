@@ -44,6 +44,11 @@ public class CardHandler : MonoBehaviour,IPointerEnterHandler {
         cover.SetActive(value);
     }
 
+    public void SetPosition(ScriptableCard.Type pos)
+    {
+        position = pos;
+    }
+
     public bool ChangePower(int value)
     {
         if (!gameObject)
