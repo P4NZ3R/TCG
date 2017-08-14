@@ -259,6 +259,8 @@ public class PlayerHandler : MonoBehaviour {
             
         creatures.Remove(card);
         RemoveEffectOnDelegates(card, ScriptableCard.Type.Battlefield);
+        RemoveEffectOnDelegates(card, ScriptableCard.Type.Hand);
+        RemoveEffectOnDelegates(card, ScriptableCard.Type.Deck);
 
 //        
         Destroy(card.gameObject);

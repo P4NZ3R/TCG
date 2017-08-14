@@ -199,8 +199,11 @@ public class GameManager : MonoBehaviour {
         CardHandler topCard = PlayerHandler.singletonPlayer.deckLeft.Count>0 ? PlayerHandler.singletonPlayer.deckLeft[0] : null;
         if (topCard)
         {
-            PlayerHandler.singletonPlayer.RemoveCardFromDeck(topCard);
-            PlayerHandler.singletonPlayer.AddCardInHand(topCard);
+            if (PlayerHandler.singletonPlayer.hand.Count < 7)
+            {
+                PlayerHandler.singletonPlayer.RemoveCardFromDeck(topCard);
+                PlayerHandler.singletonPlayer.AddCardInHand(topCard);
+            }
         }
         else
         {
@@ -214,8 +217,11 @@ public class GameManager : MonoBehaviour {
         CardHandler topCard = PlayerHandler.singletonOpponent.deckLeft.Count>0 ? PlayerHandler.singletonOpponent.deckLeft[0] : null;
         if (topCard)
         {
-            PlayerHandler.singletonOpponent.RemoveCardFromDeck(topCard);
-            PlayerHandler.singletonOpponent.AddCardInHand(topCard);
+            if (PlayerHandler.singletonPlayer.hand.Count < 7)
+            {
+                PlayerHandler.singletonOpponent.RemoveCardFromDeck(topCard);
+                PlayerHandler.singletonOpponent.AddCardInHand(topCard);
+            }
         }
         else
         {
